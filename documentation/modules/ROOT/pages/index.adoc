@@ -1,13 +1,9 @@
-= Welcome to OpenShift Starter Guides
+= Welcome to the OpenShift Student Bootcamp
 :!sectids:
-ifndef::lab[]
-:lab-name: Java
-endif::[]
 
-== Developing {lab-name} Applications on OpenShift - Starter Lab
+== Using OpenShift to create and manage container based applications
 
-link:https://www.redhat.com/en/topics/containers/whats-a-linux-container-vb[Containers,window='_blank'] are a standardized way to package apps with all of their dependencies to simplify deployment and speed delivery. Unlike virtual machines, containers do not bundle to the operating system. Only the application code, run time, libraries, and settings are packaged inside of containers. Thus, containers are more lightweight, portable, and efficient as compared to virtual machines.
+Welcome to the OpenShift Student Bootcamp. Over the next 2 days we will provide presentations, hands-on workshops and Q&A sessions to provide a structured introduction to container based applications running on the OpenShift platform from Red Hat. 
 
-For developers looking to kickstart their projects, link:https://openshift.com/[OpenShift,window='_blank'] enables efficient application development through streamlined workflows and validated integrations.
+Two pieces of information are required to configure the workshop instructions so that the corect OpenShift platform and username are included in the generated commands. When you then copy the commands during the workshop exercises they will work correctly within your environment.
 
-This Lab is accompanied by the slide deck available at link:https://dn.dev/openshift-workshop[dn.dev/openshift-workshop,window='_blank']
