@@ -1,5 +1,10 @@
+* xref:01-workshop-summary.adoc[Workshop Summary]
+* xref:02-deploying-first-app.adoc[Deploying an App to OpenShift]
+* xref:03-deploying-app-s2i.adoc [Deploying from Source Code]
+* xref:04-environment-variables.adoc [Using Environment Variables]
+* xref:05-modifying-container-config [Modifying a Running Container]
+* xref:06-extending-the-application [Linking containers]
 * OLD FILES
-** xref:01-workshop-summary.adoc[Workshop Summary]
 ** xref:common-environment.adoc[OpenShift Architecture]
 ** xref:common-explore.adoc[Explore OpenShift]
 *** xref:common-explore.adoc#the_web_console[The Web Console]
