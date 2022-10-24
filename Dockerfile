@@ -1,9 +1,14 @@
-FROM docker.io/antora/antora as builder
+FROM node:latest
 
-ADD . /antora/
+RUN mkdir -p /opt/src
 
-RUN antora generate --stacktrace site.yml
+WORKDIR /opt/src
 
-FROM registry.access.redhat.com/rhscl/httpd-24-rhel7
+ADD . /opt/src
 
-COPY --from=builder /antora/gh-pages/ /var/www/html/
+RUN chgrp -R 0 /opt/src && \
+    chmod -R g=u /opt/src
+
+RUN npm install
+
+CMD npm run dev -d
