@@ -1,5 +1,5 @@
 name: rhs-openshift-starter-guides
-title: OpenShift Starter Guides
+title: OpenShift Student Bootcamp
 version: 4.9
 nav:
   - modules/ROOT/nav.adoc
