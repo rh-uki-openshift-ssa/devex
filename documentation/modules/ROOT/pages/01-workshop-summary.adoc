@@ -5,7 +5,7 @@ This bootcamp workshop will give you a hands on introduction to using OpenShift 
 
 Topics which this workshop will cover include:
 
-=== Day 1
+== Day 1
 
 * Demonstration of 'end state' of the application including scaling, health probes, configuration data
 * Application hosting and containers
@@ -16,7 +16,7 @@ Topics which this workshop will cover include:
 ** Application configuration (via the running pod)
 * Extending the application - Create a second pod and linking it to the first
 
-=== Day 2
+== Day 2
 
 * More application configuration
 ** Config maps
