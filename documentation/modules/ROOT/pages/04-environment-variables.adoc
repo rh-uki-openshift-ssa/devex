@@ -1,1 +1,15 @@
-text body
+= Using Environment Variables
+:navtitle: Using Environment Variable
+
+[#the_web_console]
+== The purpose of environment variables
+
+Environment variables are used to modifify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time. 
+
+For example, an application that stored user personal data needs to connect to different databases in different phases of the development lifecycle. In the development phase dummy data is used, in the QA phase a larger volume of obfuscated data is used and in production the application connects to a database holding genuine customer data. The following code snippet for Node.JS shows how an environment variable can be read by the application to configure connectivity.
+
+[.console-output]
+[source,bash]
+----
+var dbConnection = process.env.DB_CONNECTION;
+----
