@@ -12,5 +12,5 @@ Your course facilitators will provide you with :
 * Common OpenShift platform URL
 * Personal user ID for your use only
 
-image::01-workshop-introduction-cluster-and-userid.png[Setting cluster and username,800,align="center"]
+image::index-01-workshop-introduction-cluster-and-userid.png[Setting cluster and username,800,align="center"]
 

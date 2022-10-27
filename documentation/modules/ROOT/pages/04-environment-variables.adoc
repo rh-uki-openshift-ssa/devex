@@ -13,3 +13,13 @@ For example, an application that stored user personal data needs to connect to d
 ----
 var dbConnection = process.env.DB_CONNECTION;
 ----
+
+The diagram below shows the parts introduced in section 1, Deploying an Application to OpenShift. The resources created within the cluster are the route, service and deployment. The deployment is responsible for creating the associated pods that it defines. The files used to create the resources are shown outside the cluster as external entities. A user is shown interacting with the application from outside the cluster via the route.
+
+image::04-01-Environment-variables.png[Environment variable placement,800,align="center"]
+
+Environment variables can be applied to the deployment resource. This ensures that they are applied to all instances of the application pods, since the pods may be restarted and scalled up and down. As new pods are created by the application scaling the environment variables will be applied appropriately as shown below. 
+
+image::04-02-Environment-variables-on-pods.png[Environment variable on pods,500,align="center"]
+
+
