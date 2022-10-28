@@ -4,7 +4,7 @@
 [#the_web_console]
 == The purpose of environment variables
 
-Environment variables are used to modifify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time. 
+Environment variables are used to modify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time.
 
 For example, an application that stored user personal data needs to connect to different databases in different phases of the development lifecycle. In the development phase dummy data is used, in the QA phase a larger volume of obfuscated data is used and in production the application connects to a database holding genuine customer data. The following code snippet for Node.JS shows how an environment variable can be read by the application to configure connectivity.
 
@@ -18,8 +18,42 @@ The diagram below shows the parts introduced in section 1, Deploying an Applicat
 
 image::04-01-Environment-variables.png[Environment variable placement,800,align="center"]
 
-Environment variables can be applied to the deployment resource. This ensures that they are applied to all instances of the application pods, since the pods may be restarted and scalled up and down. As new pods are created by the application scaling the environment variables will be applied appropriately as shown below. 
+Environment variables can be applied to the deployment resource. This ensures that they are applied to all instances of the application pods, since the pods may be restarted and scalled up and down. As new pods are created by the application scaling the environment variables will be applied appropriately as shown below.
 
 image::04-02-Environment-variables-on-pods.png[Environment variable on pods,500,align="center"]
 
+== Adding environment variables
 
+To add environment variables to an application it is necessary to make a modification to the deployment resource.
+
+Switch to the 'developer' context on the top left hand corner of the OpenShift user interface and select the topology view, as shown below.
+
+image::04-03-topology-view.png[Developer context topology view,500,align="left"]
+
+This will show the running instance of the application you created in the previous section. Select the application to generate the details pop out window on the right hand side as shown below.
+
+image::04-04-topology-and-application-details.png[Application topology and details,700,align="center"]
+
+From the actions menu on the right hand side select Edit Deployment. This will give you the opportunity to make a variety of changes to the deployment such as :
+
+* Deployment strategy
+* Images used
+* scaling
+
+There are two possible views available for editing the deployment. The first is the guided form view and the second is the yaml (markup) view. To begin with ensure you are using the form view as shown below.
+
+image::04-05-deployment-edit-form-view.png[Deployment edit form view,700,align="center"]
+
+[NOTE]
+.Form view limitations
+====
+While the form view is very good it is limited in terms of the complete set of attributes and configuration options that can be applied to the deployment. As the message above shows, to configure some elements of the deployment requires the yaml view.
+====
+
+Before adding the environment variables experiment with the specific rest endpoint that displays them. Use the command line interface to send a request to the endpoint as shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+curl -k https://{app-1}-%PROJECT%.%CLUSTER_SUBDOMAIN%/endpoints/envVars
+----

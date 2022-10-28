@@ -2,8 +2,11 @@ runtime:
   cache_dir: ./.cache/antora
 
 site:
-  title: OpenShift Starter Guides
-  url: http://redhat-scholars.github.io/openshift-starter-guides/
+  title: Student Bootcamp (Dev Mode)
+#  url: http://redhat-uk.github.io/student-bootcamp-2-day/  ---- Project on github.io, yet to be created
+  start_page: openshift-student-bootcamp-2-day::index.adoc
+
+  url:
   start_page: rhs-openshift-starter-guides::index.adoc
 
 content:
@@ -15,18 +18,9 @@ content:
 
 asciidoc:
   attributes:
-    #title: OpenShift Starter Guides
-    experimental: true
-    parksmap-version: latest
-    parksmap-image: quay.io/openshiftroadshow/parksmap
-    openshift-docs-url: https://docs.openshift.com/container-platform/4.9
-    openshift-version: 4.9
-    project-namespace: workshop
-    release-version: roks
-    roks-login-url: https://cloud.ibm.com/authorize/devcluster
-    page-pagination: true
-    lab: java
-    lab-name: Java
+    app-1: layer1
+    app-2: layer2
+    app-3: layer3
   extensions:
     - ./lib/tab-block.js
     - ./lib/remote-include-processor.js
