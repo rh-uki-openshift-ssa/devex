@@ -1,1 +1,71 @@
-text body
+= Modifying Container Configuration
+:navtitle: Modifying Container Configuration
+
+== Directly modifying container configuration
+
+In the last section you created two environment variables on a deployment which was subsequently propogated to the pods created by the deployment. If you look at the pod definition in the web user interface you can see the environment variables that have been applied to the pod, as shown below.
+
+image::05-01-environment-vars-on-pod.png[Environment variables on pod,700,align="center"]
+
+As you can see above these environment variables are greyed out because they are managed by a parent entity which in this case is the deployment where the environment variables were added. Having a knowledge of this hierarchy is important so that you know what you can change, and where.
+
+There are other ways that we can have an impact on the pods, however, such as the terminal.
+
+From the topology view of the OpenShift web user interface select the deployment icon. From the pop out menu on the right hand side of the screen select the pod and then from the pod sub-menu select terminal. These steps are shown graphically below :
+
+=== Step 1 - Select the application on the developer topology view.
+
+image::05-02-select-the-pod-in-topology-view.png[Select the pod in the topology view,700,align="center"]
+
+=== Step 2 - Select the pod on and view the pod specific menu.
+
+image::05-03-pod-specific-sub-menu.png[Pod specific menu,700,align="center"]
+
+=== Step 3 - Select the terminal menu.
+
+image::05-04-pod-terminal.png[Pod terminal,700,align="center"]
+
+Within the terminal view enter the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+printenv | grep VAR
+----
+
+Any changes made to the environment variables within the pod will cause confusion because the single source of truth should remain the deployment resource. Additionally, most applications only read environment variables at startup so any changes will not be picked up until the application restarts. If we restart the pod to restart the application then the enviromment variables will be read from the parent deployment again and the changes made to the pod directly will be lost.
+
+The environment variables applied to the pod will show up in the pod yaml file as shown in the snippet below.
+
+[.console-input]
+[source]
+----
+kind: Pod
+apiVersion: v1
+metadata:
+  name: bootcampapp-git-8c67fb5c8-4fch5
+  namespace: test
+  labels:
+    app: bootcampapp-git
+    deploymentconfig: bootcampapp-git
+    pod-template-hash: 8c67fb5c8
+spec:
+  restartPolicy: Always
+  containers:
+      name: bootcampapp-git
+      env:
+        - name: VAR1
+          value: Barcelona
+        - name: VAR2
+          value: Paris
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+      imagePullPolicy: Always
+----
+
+== Summary
+
+While you can view environment variables from the pod directly these should not be modified in any way. If any change is required to the configuration of a running pod then the source of that configuration should be changed.

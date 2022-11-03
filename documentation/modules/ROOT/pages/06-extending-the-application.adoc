@@ -1,1 +1,14 @@
-text body
+= Extending the application
+:navtitle: Extending the application
+
+== Application structure
+
+The application that you have created from source code is a simple Java application that exposes a number of REST endpoints. You have already used one of these in the prior sections when displaying the environment variables. To make use of the environment parameters in a more practical sense you are now going to link together two instances of the application into a single micro service based application.
+
+The application structure is shown below together with the environment parameters required.
+
+image::06-01-Application-structure.png[Application structure,800,align="center"]
+
+== Create a second instance of the application
+
+Create a second instance of the application called {app-2}, in a similar manner to how you created the first application. From the topology view of the OpenShift user interface right click on free space and select 'Add to Project' and then from the pop out menu select 'Import from Git'.

@@ -2,7 +2,6 @@
 :navtitle: Using Environment Variable
 :source-highlighter: rouge
 
-[#the_web_console]
 == The purpose of environment variables
 
 Environment variables are used to modify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time.
@@ -140,4 +139,4 @@ Environment variable : VAR2 --> Paris
 
 == Complete the chapter
 
-To complete the chapter scale the pods back to 1 in a similar way to how you scaled up to four earler.
+To complete the chapter scale the pods back to 1 in a similar way to how you scaled up to four earlier.
