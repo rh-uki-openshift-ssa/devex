@@ -18,6 +18,7 @@ content:
 
 asciidoc:
   attributes:
+    app-group-name: layers
     app-1: layer1
     app-2: layer2
     app-3: layer3

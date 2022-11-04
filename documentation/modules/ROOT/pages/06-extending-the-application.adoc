@@ -11,4 +11,83 @@ image::06-01-Application-structure.png[Application structure,800,align="center"]
 
 == Create a second instance of the application
 
-Create a second instance of the application called {app-2}, in a similar manner to how you created the first application. From the topology view of the OpenShift user interface right click on free space and select 'Add to Project' and then from the pop out menu select 'Import from Git'.
+Create a second instance of the application called {app-2}, in a similar manner to how you created the first application. From the topology view of the OpenShift user interface right click on free space and select 'Add to Project' and then from the pop out menu select 'Import from Git'. Copy the Git repository from below and paste it into the field on OpenShift.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+https://github.com/utherp0/bootcampapp.git
+----
+
+The form for creating the application has a number of fields that you need to fill out. For the section shown below, enter the Application as '{app-group-name}' and the Name as '{app-2}'
+
+image::06-02-app-creation-form-1.png[Application creation form,700,align="center"]
+
+Scroll down the application creation screen and click on create.
+
+image::06-03-app-creation-form-2.png[Application creation form,700,align="center"]
+
+== Linking the two applications using environment variables
+
+To link the two applications create an environment variable on the application called '{app-1}'. The value of this environment variable is taken from the route of the second application. To view the routes available execute the command below :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get route
+----
+
+The above will display a summary of each route in the namespace. What is needed is the specific host URL for the route called '{app-2}'. This route needs to have 'https://' put on the front of it too. It is possible to generate the exact string that we need by using the jsonpath output of the get route command. The command below will display the complete definition of the route in json format.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get route/{app-2} -o json
+----
+
+If you scroll up to look at this information you will see that the field we need is called host and it is a subfield of the block called spec. It is possible to generate a single command to display just that field. It is also possible to add the required 'https://' at the front of that command too using the -o jsonpath option shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get route/{app-2} -o jsonpath='{"https://"}{.spec.host}{"\n"}'
+----
+
+[TIP]
+.Newline character
+====
+The inclusion of the \n string at the end of the jsonpath block above ensures that the resulting string has a \n on the end to wrap to a new line. Without this the line may have a % character on the end which is easy to include in a subsequent copy operation, which can make the route host path fail.
+====
+
+Copy the result of the above command and paste it into an environment variable for the deployment '{app-1}'. To do this select the deployment from the topology view such that the right hand side information bar is displayed. Then select the actions menu and select 'Edit Deployment' as shown below.
+
+image::06-04-edit-deployment.png[Edit deployment,700,align="center"]
+
+Scroll the deployment edit screen down to the environment variable section and create a new environment variable called 'NEXTLAYER' and paste the value copied form the oc get route command above. The is shown below.
+
+image::06-05-add-environment-variable.png[Add the environment variable,700,align="center"]
+
+== Testing the linked application
+
+In a previous section curl was used to display the environment variables of the application. This approach will be used again to validate that the application can call the second instance. Copy the command below and execute it in the command window.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+curl -k https://{app-1}-%PROJECT%.%CLUSTER_SUBDOMAIN%/endpoints/callLayers
+----
+
+An example of the result that you should get from the above is shown below.
+
+[.source]
+----
+layer-1-6665678dcf-fcf8x/10.130.1.134 layer-2-778d498b59-rkhzn/10.130.1.117
+----
+
+== Command line creation of environment variables
+
+oc set env
+
+
+
+== Visual linking of the applications in the topology view
