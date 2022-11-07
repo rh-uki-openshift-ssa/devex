@@ -4,13 +4,13 @@ runtime:
 site:
   title: Student Bootcamp (Dev Mode)
   url: http://localhost:3000/rhs-openshift-starter-guides/index.html
-  start_page: rhs-openshift-starter-guides::index.adoc
+  start_page: openshift-student-bootcamp-2-day::index.adoc
 
 content:
   sources:
     - url: .
       branches: HEAD
-      #branches: [ocp-4.7, ocp-4.8, ocp-4.9] 
+      #branches: [ocp-4.7, ocp-4.8, ocp-4.9]
       start_path: documentation
       #- url: git@github.com:redhat-scholars/openshift-starter-guides-dotnet.git
       #branches: ocp-4.6
@@ -18,19 +18,10 @@ content:
 
 asciidoc:
   attributes:
-    #title: OpenShift Starter Guides(Dev Mode)
-    experimental: true
-    parksmap-version: latest
-    parksmap-image: quay.io/openshiftroadshow/parksmap
-    openshift-docs-url: https://docs.openshift.com/container-platform/4.9
-    openshift-version: 4.9
-    project-namespace: workshop
-    kubernetes-version: v1.22.0
-    release-version: ocp
-    roks-login-url: https://cloud.ibm.com/authorize/devcluster
-    page-pagination: true
-    lab: java
-    lab-name: Java
+    app-group-name: layers
+    app-1: layer1
+    app-2: layer2
+    app-3: layer3
   extensions:
     - ./lib/remote-include-processor.js
     - ./lib/tab-block.js

@@ -1,1 +1,142 @@
-text body
+= Using Environment Variables
+:navtitle: Using Environment Variable
+:source-highlighter: rouge
+
+== The purpose of environment variables
+
+Environment variables are used to modify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time.
+
+For example, an application that stored user personal data needs to connect to different databases in different phases of the development lifecycle. In the development phase dummy data is used, in the QA phase a larger volume of obfuscated data is used and in production the application connects to a database holding genuine customer data. The following code snippet for Node.JS shows how an environment variable can be read by the application to configure connectivity.
+
+[.console-output]
+[source,bash]
+----
+var dbConnection = process.env.DB_CONNECTION;
+----
+
+The diagram below shows the parts introduced in section 1, Deploying an Application to OpenShift. The resources created within the cluster are the route, service and deployment. The deployment is responsible for creating the associated pods that it defines. The files used to create the resources are shown outside the cluster as external entities. A user is shown interacting with the application from outside the cluster via the route.
+
+image::04-01-Environment-variables.png[Environment variable placement,800,align="center"]
+
+Environment variables can be applied to the deployment resource. This ensures that they are applied to all instances of the application pods, since the pods may be restarted and scalled up and down. As new pods are created by the application scaling the environment variables will be applied appropriately as shown below.
+
+image::04-02-Environment-variables-on-pods.png[Environment variable on pods,500,align="center"]
+
+== View application without environment variables
+
+Before adding the environment variables experiment with the specific rest endpoint that displays them. Use the command line interface to send a request to the endpoint as shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+curl -k https://{app-1}-%PROJECT%.%CLUSTER_SUBDOMAIN%/endpoints/envVars
+----
+
+The above will result in the response (ip address and pod name will differ) :
+
+[.source]
+----
+app-1-58b9f9c7fb-f94g9/10.129.0.138 No environment variables have been set
+----
+
+The above confirms that you have not yet created any environment variables.
+
+== Adding environment variables
+
+To add environment variables to an application it is necessary to make a modification to the deployment resource.
+
+Switch to the 'developer' context on the top left hand corner of the OpenShift user interface and select the topology view, as shown below.
+
+image::04-03-topology-view.png[Developer context topology view,500,align="left"]
+
+This will show the running instance of the application you created in the previous section. Select the application to generate the details pop out window on the right hand side as shown below.
+
+image::04-04-topology-and-application-details.png[Application topology and details,700,align="center"]
+
+From the actions menu on the right hand side select Edit Deployment. This will give you the opportunity to make a variety of changes to the deployment such as :
+
+* Deployment strategy
+* Images used
+* scaling
+
+There are two possible views available for editing the deployment. The first is the guided form view and the second is the yaml (markup) view. To begin with ensure you are using the form view as shown below.
+
+image::04-05-deployment-edit-form-view.png[Deployment edit form view,700,align="center"]
+
+[NOTE]
+.Form view limitations
+====
+While the form view is very good it is limited in terms of the complete set of attributes and configuration options that can be applied to the deployment. As the message above shows, to configure some elements of the deployment requires the yaml view.
+====
+
+Scroll the form view down until you see the environment variables section.
+
+Create two environment variables with the names VAR1 and VAR2. The values you provide can be whatever you want, but the names of the variables must match what the application is looking for which is VAR1 and VAR2. There is only one field displayed for the entry of an environment variable so use the 'Add value' link to create another entry fields for the second variable.
+
+When you have completed the creation of the variables press save.
+
+image::04-06-adding-environment-vars.png[Adding environment variables,700,align="center"]
+
+[sidebar]
+.Watch the pod being recreated
+--
+Watch closely the topology view of the user interface after you have created the variables. If you missed anything happening edit the deployment again and change one of the values of an environment variable. What you should see is the old pod shutting down and a new pod being created. On the right hand side pop out section you should also see the old pod being terminated and new pod being created.
+--
+
+Use the curl command again and this time you should see the variables from the application.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+curl -k https://{app-1}-%PROJECT%.%CLUSTER_SUBDOMAIN%/endpoints/envVars
+----
+
+The above will result in the response (ip address and pod name will differ) :
+
+[.source]
+----
+app-1-655f9f54fd-twx42/10.129.0.90
+Environment variable : VAR1 --> Barcelona
+Environment variable : VAR2 --> Paris
+----
+
+Note that the above pod name and ip address differ from the values shown earlier when there were no environment variables because it is accessing a different pod.
+
+== Multiple Pods
+
+The diagram at the top of the page showed that a single deployment definition can have multiple pods within it. In a separate chapter later on you will learn a lot more about scaling, but to show the creation of environment variables on multiple pods we need to scale the application now.
+
+On the topology view select the running application to display the pop out menu on the right hand side. Select the details tab as shown below.
+
+image::04-07-scaling-the-pod.png[Scaling the pod,700,align="center"]
+
+Press the up arrow on the right of the pod symbol three times to scale up to having four replicas.
+
+Use the curl command again in the terminal window to repeat the request to the application to display the environment variables. You will see an output similar to that which is shown below in which the environment variable are clearly applied to the four individual pods that are running on different ip addresses.
+
+[subs="quotes"]
+----
+➜  ~ curl -k https://<app-url>/endpoints/envVars
+*app-1-655f9f54fd-twx42/10.129.0.90*
+Environment variable : VAR1 --> Barcelona
+Environment variable : VAR2 --> Paris
+
+➜  ~ curl -k  https://<app-url>/endpoints/envVars
+*app-1-655f9f54fd-99ztb/10.128.1.206*
+Environment variable : VAR1 --> Barcelona
+Environment variable : VAR2 --> Paris
+
+➜  ~ curl -k  https://<app-url>/endpoints/envVars
+*app-1-655f9f54fd-qw94b/10.129.0.93*
+Environment variable : VAR1 --> Barcelona
+Environment variable : VAR2 --> Paris
+
+➜  ~ curl -k  https://<app-url>/endpoints/envVars
+*app-1-655f9f54fd-cdcgm/10.130.0.237*
+Environment variable : VAR1 --> Barcelona
+Environment variable : VAR2 --> Paris
+----
+
+== Complete the chapter
+
+To complete the chapter scale the pods back to 1 in a similar way to how you scaled up to four earlier.
