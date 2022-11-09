@@ -1,1 +1,77 @@
-text body
+= Adding Container Storage
+:navtitle: Adding container Storage
+
+[#ephemeral_container_storage]
+== Ephemeral Container Storage
+
+Containers by their nature are ephemeral – they are should lived compute units with no data persistence. Any data a container works with or produces is held within runtime memory – as a result of which stopping or restarting a container results in data loss.
+
+Although containers appear to have a file system, this by default is an in memory file system. In the following screen shot, you can see the root directory structure from within our container, which is used by our java application - this is all within volatile memory.
+
+image::08-01-container-filesystem.png[container root filesystem,700,align="center"]
+
+
+[#container_volumes]
+== Container Volumes
+
+
+However, applications are only part of the puzzle when trying to build something useful – we need data. Part of this challenge is resolved by using volumes, which can be attached to containers. In its simplest form, a container volume is simply a folder accessible to the host that the container runs on, which is mapped to a folder within the container. For example:
+
+
+On host:
+
+[.console-output]
+[source,bash]
+----
+/mnt/data/
+----
+
+Within container:
+[.console-output]
+[source,bash]
+----
+/mnt/database/
+----
+
+
+Joining them together:
+
+[.console-output]
+[source,bash]
+----
+podman run –-name mycotainer -v /mnt/data:/mnt/database:Z mycontainer-image:v1
+----
+
+When the command above is run, a container called "mycontainer" is started on the host. It uses a container image called "mycontainer-image" with the tag "v1". It also maps the local folder /mnt/data to the folder within the container /mnt/database. The -v switch simply means "volume" and the ":Z" attribute is a security feature which we won't go into at this stage (it involves a security system called SELinux)
+
+Once the container starts, if we were to look inside the container under /mnt/database, we would see that the content of that folder matches /mnt/data on the host. And crucially, we can both read a write data to this folder in real time. 
+
+Now that the /mnt/database has persistence to a real storage device, each time the container stop and starts the pre-existing volume will be mounted and available for consumption by the container. This allows data persistance for any application that we want to design and run within a container eco system.
+
+
+[#openshift_storage]
+== OpenShift Storage
+
+Local storage volumes are great for a small number of containers, but real world deployments of containerised applications can have hundreds if not thousands of containers running that all need persistent storage for data. This would quickly become difficult to manage manually using the methodology we have discussed so far. Happily, kubernetes and thefore Red Hat OpenShift has a technology which makes the provision and management of containerised storage relatively simple. It is called "Persitent Volumes" and "Persistent Volume Claims". A key thing to remember is however, that this technology still makes use of the volume mounts typology that we have breifly discussed "under the hood".
+
+[#persistent_volumes]
+== Persistent volumes
+
+[#persistent_volume_claims]
+== Persistent Volume Claims
+
+
+[#build_our_app]
+== Build our App
+
+
+[#test_storage_persistance]
+== Test our Storage persistance
+
+=== Step 1 - Without a Persistent Volume
+
+=== Step 2 - With a Persistent Voume
+
+
+
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/
