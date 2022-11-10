@@ -77,6 +77,11 @@ A PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar 
 
 === Step 2 - With a Persistent Voume
 
+[#add_storage_to_workshop]
+== Adding a persistent volume to our Bootcamp app
+
+
+
 
 
 https://kubernetes.io/docs/concepts/storage/persistent-volumes/
