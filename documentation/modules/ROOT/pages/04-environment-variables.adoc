@@ -2,6 +2,32 @@
 :navtitle: Using Environment Variable
 :source-highlighter: rouge
 
+image::04-topology-image.png[Example Topology Image]
+
+== Using Environment Variables to configure application behaviour
+
+====
+*What will you learn?*
+
+This Module will introduce you to the concepts of *Environment Variables* and hown they can be used to configure the behaviour of an application.
+
+You will learn how to add environment variables to an application using the OpenShift web interface and the command line interface.
+
+After completing the Module you will understand the concepts of an application configuration with fixed environment variables.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the Module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be deployed will also have been created in a prior exercise too.
+
+Ensure that the two textboxes at the top of this HTML Guide to the Module contain the Cluster address provided by the workshop facilitators and the project you have been assigned. If not use the 'Copy' button on the text below to get the Cluster address and add it to the Cluster textbox above (pressing *RETURN* after pasting it). Then add the Project name if it is not already there, again pressing *RETURN* after entering it into the field.
+
+[.console-input]
+[source,bash]
+----
+%CLUSTER_SUBDOMAIN%
+----
+
 == The purpose of environment variables
 
 Environment variables are used to modify the behaviour of an application at deployment time. This allows generic container images to be created which can then be told how to behave, or to which systems they should connect, at the deployment time.
