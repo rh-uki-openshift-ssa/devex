@@ -19,9 +19,10 @@ content:
 asciidoc:
   attributes:
     app-group-name: layers
-    app-1: layer1
-    app-2: layer2
-    app-3: layer3
+    app-1: layer-1
+    app-2: layer-2
+    app-3: layer-3
+    app-4: layer-4
   extensions:
     - ./lib/remote-include-processor.js
     - ./lib/tab-block.js
