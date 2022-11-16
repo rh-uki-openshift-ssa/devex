@@ -1,0 +1,29 @@
+= The Container Registry and Deploying applications
+:navtitle: The Container Registry and Deploying applications
+:source-highlighter: rouge
+
+== The Container Registry and Deploying applications
+
+====
+*What will you learn?*
+
+This module will introduce you to the concepts of the image registry within the OpenShift platform and how to use it.
+
+This module will also cover external 'enterprise' image registries such as Red Hat Quay and quay.io.
+
+After completing the module you will understand how the image registry is used within the OpenShift platform. You will also know how to use images from the OpenShift registry.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
+
+Ensure that the two textboxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
+== Introducing the OpenShift Image Registry
+
+The purpose of the image registry is to store container images for use on the OpenShift cluster. Such images may be built by a build process directly on the cluster, or the images may be pulled from other registries to be used imediately or for later use on the cluster.
+
+A number of terms are used when describing the image registry within OpenShift.
+
+* Registry is used to describe an instance of something that can hold multiple container images. As you will soon see the notion of a 'registry' is actually an entity that is split across multiple items within the cluster, rather than being a single entity.
