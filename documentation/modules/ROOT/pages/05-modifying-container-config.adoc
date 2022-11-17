@@ -2,6 +2,23 @@
 :navtitle: Modifying Container Configuration
 
 == Directly modifying container configuration
+====
+*What will you learn?*
+
+This module will introduce you to the correct way to manage container configuration.
+
+You will learn how to ensure that containers (and the pods in which they run) are configured correctly.
+
+After completing the module you will understand how to configure running containers.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
+
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
+== Modifying the container configuration
 
 In the last section you created two environment variables on a deployment which was subsequently propogated to the pods created by the deployment. If you look at the pod definition in the web user interface you can see the environment variables that have been applied to the pod, as shown below.
 

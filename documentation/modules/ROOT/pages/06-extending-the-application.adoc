@@ -1,6 +1,26 @@
 = Extending the application
 :navtitle: Extending the application
 
+image::06-00-Simple-application-structure.png[Simple application structure,800,align="center"]
+
+== Extending the application
+
+====
+*What will you learn?*
+
+This module will introduce you to the extension of an application to multiple elements that are configured to communicate together.
+
+You will learn how to add additional elements to a micro service based application.
+
+After completing the module you will understand how to extend an application and ensure that one element is aware of another for network connectivity.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
+
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
 == Application structure
 
 The application that you have created from source code is a simple Java application that exposes a number of REST endpoints. You have already used one of these in the prior sections when displaying the environment variables. To make use of the environment parameters in a more practical sense you are now going to link together two instances of the application into a single micro service based application.

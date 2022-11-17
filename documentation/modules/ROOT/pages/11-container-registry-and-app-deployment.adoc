@@ -18,12 +18,26 @@ After completing the module you will understand how the image registry is used w
 
 In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
 
-Ensure that the two textboxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
 
 == Introducing the OpenShift Image Registry
 
-The purpose of the image registry is to store container images for use on the OpenShift cluster. Such images may be built by a build process directly on the cluster, or the images may be pulled from other registries to be used imediately or for later use on the cluster.
+The purpose of the image registry is to store container images for use on the OpenShift cluster. Such images may be created by a build process directly on the cluster, or the images may be pulled from other registries to be used immediately or for later use on the cluster.
+
+=== Terms
 
 A number of terms are used when describing the image registry within OpenShift.
 
-* Registry is used to describe an instance of something that can hold multiple container images. As you will soon see the notion of a 'registry' is actually an entity that is split across multiple items within the cluster, rather than being a single entity.
+* *Registry* is used to describe an instance of something that can hold multiple container images. As you will soon see the notion of a 'registry' in OpenShift is actually an entity that is split across multiple items within the cluster, rather than being a single entity.
+
+* *Enterprise Registry* is used to refer to a registry that exists within a third party solution purely for the purpose of storing, cataloguing and serving images.
+
+* *Image Stream* is an entity that exists within a namespace of an OpenShift cluster for the storage of one or more container images. Generally a separate imagestream is used for each specific image. As the software evolves and new container images are built, new tagged images appear within the imagestream. The OpenShift image registry is a collection of multiple image streams across multiple namespaces.
+
+* *Image Tag* is a unique identifier for a version of an image within the image stream or within an enterprise registry.
+
+=== Container image creation and management
+
+Container images are created as a result of a build process running on the OpenShift container platform. The image is stored in an image stream within a namespace from where it is deployed to be executed on the container platform. If the testing activity is successful the container image may then be pushed to an enterprise registry, with a name and tag, from where it may then be pulled by other clusters to deploy the container image. This process is shown below.
+
+image::11-01-container-image-journey.png[Container Image Journey]
