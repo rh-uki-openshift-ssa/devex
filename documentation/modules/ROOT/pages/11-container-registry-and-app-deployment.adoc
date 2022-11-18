@@ -60,6 +60,8 @@ image::11-03-developer-topology-view.png[Developer topology view,800,align="cent
 
 The menu on the left hand side of the screen shows a number of developer centric operations such as viewing a build configuration to execute a build. There are also options to view config maps and secrets too. These are typical things that developers will do. The menu items we need for the image registry are actually on the administrator menu. While your role may not fit that description exactly, there are some tasks that you need to do that are described in this way. Switch the perspective to the administrator perspective using the option on the top left of the screen by clicking on the word 'Developer'.
 
-The administrator perspective is shown below.
+The administrator perspective is shown below. The project that you can see will depend on your user number - %PROJECT%.
 
 image::11-04-administrator-view.png[Administrator view,800,align="center"]
+
+ff
