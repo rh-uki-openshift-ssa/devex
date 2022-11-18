@@ -1,6 +1,8 @@
 = Modifying Container Configuration
 :navtitle: Modifying Container Configuration
 
+image::05-00-Modifying-environment-vars-in-pods.png[Modifyuing a running container,600,align="center"]
+
 == Directly modifying container configuration
 ====
 *What will you learn?*

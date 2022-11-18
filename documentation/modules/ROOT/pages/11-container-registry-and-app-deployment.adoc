@@ -2,6 +2,8 @@
 :navtitle: The Container Registry and Deploying applications
 :source-highlighter: rouge
 
+image::11-00-image-registry.png[Container Image Journey,600,align="center"]
+
 == The Container Registry and Deploying applications
 
 ====
@@ -38,6 +40,26 @@ A number of terms are used when describing the image registry within OpenShift.
 
 === Container image creation and management
 
-Container images are created as a result of a build process running on the OpenShift container platform. The image is stored in an image stream within a namespace from where it is deployed to be executed on the container platform. If the testing activity is successful the container image may then be pushed to an enterprise registry, with a name and tag, from where it may then be pulled by other clusters to deploy the container image. This process is shown below.
+Container images are created as a result of a build process running on the OpenShift container platform. The build process is responsible for the compilation, or packaging, of source code and the delivering of the executable package to the base container image. This creates a new container image ready to run your application. The image is stored in an image stream within a namespace from where it is deployed to be executed on the container platform. This process is shown below. If you have successfully completed the prior sections of the workshop then you will have a number of container images in image streams already.
 
-image::11-01-container-image-journey.png[Container Image Journey]
+image::11-01-container-image-journey.png[Container Image Journey,800,align="center"]
+
+If the testing activity is successful, and the team wishes to share the container image wide, then the container image may then be pushed to an enterprise registry, with a new name and tag. From the enterprise registry it may be pulled by other clusters to deploy the container image to (for example) quality assurance clusters and ultimately a production cluster. This process is shown below.
+
+image::11-02-container-image-journey-enterprise.png[Container Image Journey - to production,800,align="center"]
+
+== Viewing the container registry
+
+The container registry can be viewed and modified usng the OpenShift graphical user interface and via the command line interface. both will be used here to interact with the container registry.
+
+=== Graphical interface interaction with container registry
+
+On the OpenShift web user interface select the developer perspective on the top left of the screen and then select the topology view. This will show a number of deployments depending on how many you chose to create in the section on extending your application.
+
+image::11-03-developer-topology-view.png[Developer topology view,800,align="center"]
+
+The menu on the left hand side of the screen shows a number of developer centric operations such as viewing a build configuration to execute a build. There are also options to view config maps and secrets too. These are typical things that developers will do. The menu items we need for the image registry are actually on the administrator menu. While your role may not fit that description exactly, there are some tasks that you need to do that are described in this way. Switch the perspective to the administrator perspective using the option on the top left of the screen by clicking on the word 'Developer'.
+
+The administrator perspective is shown below.
+
+image::11-04-administrator-view.png[Administrator view,800,align="center"]
