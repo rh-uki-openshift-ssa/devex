@@ -8,16 +8,5 @@ You can find all urls, hostnames, usernames and passwords that are needed during
 
 Console Address: https://console-openshift-console.%CLUSTER_SUBDOMAIN% +
 
-Username: %USERNAME% + 
+Username: %USERNAME% +
 Password: %PASSWORD% +
-
-
-[#workshop_guides]
-== Workshop Guides
-
-Web: link:https://redhat-scholars.github.io/openshift-starter-guides/rhs-openshift-starter-guides/index.html[Starter Guides,window='_blank']
-
-[#git_server]
-== Git Server
-
-Web: link:https://github.com[GitHub,window='_blank']

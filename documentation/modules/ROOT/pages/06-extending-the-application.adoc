@@ -1,6 +1,26 @@
 = Extending the application
 :navtitle: Extending the application
 
+image::06-00-Simple-application-structure.png[Simple application structure,800,align="center"]
+
+== Extending the application
+
+====
+*What will you learn?*
+
+This module will introduce you to the extension of an application to multiple elements that are configured to communicate together.
+
+You will learn how to add additional elements to a micro service based application.
+
+After completing the module you will understand how to extend an application and ensure that one element is aware of another for network connectivity.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
+
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
 == Application structure
 
 The application that you have created from source code is a simple Java application that exposes a number of REST endpoints. You have already used one of these in the prior sections when displaying the environment variables. To make use of the environment parameters in a more practical sense you are now going to link together two instances of the application into a single micro service based application.
@@ -59,13 +79,17 @@ oc get route/{app-2} -o jsonpath='{"https://"}{.spec.host}{"\n"}'
 The inclusion of the \n string at the end of the jsonpath block above ensures that the resulting string has a \n on the end to wrap to a new line. Without this the line may have a % character on the end which is easy to include in a subsequent copy operation, which can make the route host path fail.
 ====
 
-Copy the result of the above command and paste it into an environment variable for the deployment '{app-1}'. To do this select the deployment from the topology view such that the right hand side information bar is displayed. Then select the actions menu and select 'Edit Deployment' as shown below.
+Copy the result of the above command and paste it into an environment variable for the deployment '{app-1}'. To do this select the deployment, {app-1}, on the topology view such that the right hand side information bar is displayed. Then select the actions menu and select 'Edit Deployment' as shown below.
 
 image::06-04-edit-deployment.png[Edit deployment,700,align="center"]
 
-Scroll the deployment edit screen down to the environment variable section and create a new environment variable called 'NEXTLAYER' and paste the value copied form the oc get route command above. The is shown below.
+Scroll the deployment edit screen down to the environment variable section and create a new environment variable called 'NEXTLAYER' and paste the value copied from the oc get route command above. The is shown below.
 
 image::06-05-add-environment-variable.png[Add the environment variable,700,align="center"]
+
+Press the blue button with 'save' on it to commit the change. This will cause a new version of the application to deploy and you may be able to see a pale blue ring inside the dark blue ring of the application as the new version is deployed. This only takes asecond or two so it might be hard to spot. An example is shown below with the deployment on the left hand side in the process of being re-deployed.
+
+image::06-06-re-deployment.png[Re-deployment,500,align="center"]
 
 == Testing the linked application
 
@@ -86,8 +110,123 @@ layer-1-6665678dcf-fcf8x/10.130.1.134 layer-2-778d498b59-rkhzn/10.130.1.117
 
 == Command line creation of environment variables
 
-oc set env
+It is also possible to set the environment variable using the command line interface. Before doing this it is necessary to clear the existing setting. Select the deployment, {app-1}, on the topology view such that the right hand side information bar is displayed. Then select the actions menu and select 'Edit Deployment' as done previously.
 
+Scroll the deployment edit screen down to the environment variable section and delete the environment variable using the grey 'no entry' symbol on the right hand side of the environment variable. There should be no environment variables set at this point. Press the blue button with 'save' on it to commit the change.
 
+Use the curl command again below to test that only one layer of the appication responds.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+curl -k https://{app-1}-%PROJECT%.%CLUSTER_SUBDOMAIN%/endpoints/callLayers
+----
+
+To put the environment variable back into the deployment using the command line you can use the 'oc set env' command. This command has a large number of options which can be explored using the command below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc set env --help
+----
+
+The usage of the command in this context will be to set the environment variable NEXTLAYER to the route of the second layer application as discovered previously. Scroll back through the command window to find the route information or repeat the command below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get route/{app-2} -o jsonpath='{"https://"}{.spec.host}{"\n"}'
+----
+
+To apply the route execute the following command by pasting the result of the above command to replace the text <replace-this>.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc set env deployment/{app-1} NEXTLAYER=<replace-this>
+----
+
+To view the result of adding the environment variable in the command line window you can use this command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc describe deployment/{app-1}
+----
+
+scroll back up the output on screen to look for a section similar to that which is shown below.
+
+image::06-07-deployment-described.png[Deployment described,800,align="center"]
+
+The environment information is a single line amongst a lot of other text regarding the deployment. To see just the environment variables the 'oc get' command can be used with a similar jsonpath argument as was used previously when looking at the route.
+
+To see the json data for the deployment start with the command below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get deployment/{app-1} -o json
+----
+
+If you scroll up to look at this information you will see that the data of interest is indented several layers withihn the json block in a structure similar to this :
+
+[.source]
+----
+spec
+  template
+    spec
+      containers
+        env
+----
+
+Note that containers is an array since there may be more than one container in the deployment. In this case there is only one container so the array index is [0].  The command below will display the environment varaible information.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get deployment/{app-1} -o jsonpath='{.spec.template.spec.containers[0].env}{"\n"}'
+----
+
+The result should look similar to this.
+
+[.source]
+----
+[{"name":"NEXTLAYER","value":"https://layer-2-user3.apps.skylake.demolab.local"}]
+----
+
+The above indicates the name and value of the environment variable. If more than one had been set the environment variables would be a comma separated list. Feel free to add another environment variable to try it out.
+
+Piping the output to the jq command can be helpful to convert the output back into a json representation as shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get deployment/{app-1} -o jsonpath='{.spec.template.spec.containers[0].env}{"\n"}' | jq
+----
+
+Results in :
+
+image::06-08-env-var-display-with-jq.png[Environment variable display with jq,800,align="center"]
 
 == Visual linking of the applications in the topology view
+
+The relationship that has been created between the two parts of the microservice based application can be displayed visually on the topology view of OpenShift by drawing lines with arrows from one deployment to another.
+
+Float the mouse over the deployment from which you want the line to start. This will cause a blue line with an arrow to pop out on the right hand side of the deployment as shown below.
+
+image::06-09-arrow-on-deployment.png[Arrow on deployment,800,align="center"]
+
+Press and hold the mouse on the arrow of the line and while holding the mouse button down drag across to the target deployment as shown below.
+
+image::06-10-dropping-the-arrow.png[Dropping the arrow,800,align="center"]
+
+Let go of the mouse button and the visual representation is created.
+
+[NOTE]
+====
+The addition of the visual representation of a relationship between two deployments is purely visual and has no controlling influence over the behaviour of the deployments.
+====
+
+== Extending further
+
+Feel free to experiment and add more deployments called {app-3} and {app-4} if you wish. Follow the instructions above to idnetify the routes and add environment variables to create a longer layers application.

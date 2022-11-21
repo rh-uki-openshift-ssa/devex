@@ -1,0 +1,68 @@
+= <Chapter title>
+:navtitle: <Chapter title>
+:source-highlighter: rouge
+
+image::<typical-image-for-the-chapter>.png[<image-description>]
+
+== Heading 1
+
+====
+*What will you learn?*
+
+This module will introduce you to ......
+
+You will learn how to ......
+
+After completing the module you will understand .......
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project. The project will have been created in a prior exercise. The application to which the environment variables will be added will also have been created in a prior exercise.
+
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
+== First content section
+
+[.source]
+----
+<source block example - not to include the copy button on the right>.
+----
+
+The following block includes the project and cluster variables which can be copied from this field using the copy button that will appear on the right hand side. This also includes the project variables that have values appled from dev-site.yml file blocks such as :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+Project : %PROJECT%
+Cluster : %CLUSTER_SUBDOMAIN%
+
+Example of using variables from dev-site.yml
+
+{app-1}
+{app-2}
+----
+
+Bullet points ....
+
+* Deployment strategy
+* Images used
+* scaling
+
+[NOTE]
+.Title (can be blank)
+====
+A note
+====
+
+[IMPORTANT]
+.Title (can be blank)
+====
+Something important
+====
+
+[TIP]
+.Title (can be blank)
+====
+A tip
+====
