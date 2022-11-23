@@ -30,13 +30,27 @@ The purpose of the image registry is to store container images for use on the Op
 
 A number of terms are used when describing the image registry within OpenShift.
 
-* *Registry* is used to describe an instance of something that can hold multiple container images. As you will soon see the notion of a 'registry' in OpenShift is actually an entity that is split across multiple items within the cluster, rather than being a single entity.
+* *Registry* is used to describe an instance of something that can hold multiple container images in different repositories. As you will soon see the notion of a 'registry' in OpenShift is actually split across a number of repositories.
 
 * *Enterprise Registry* is used to refer to a registry that exists within a third party solution purely for the purpose of storing, cataloguing and serving images.
 
-* *Image Stream* is an entity that exists within a namespace of an OpenShift cluster for the storage of one or more container images. Generally a separate imagestream is used for each specific image. As the software evolves and new container images are built, new tagged images appear within the imagestream. The OpenShift image registry is a collection of multiple image streams across multiple namespaces.
+* *Image Repository* is a collection of related images that have the same name but have different tags to denote specific versions of the container image.
+
+* *Image Stream* is an entity that exists within a namespace of an OpenShift cluster for the storage of one or more container images. Generally a separate imagestream is used for each specific image. As the software evolves and new container images are built, new tagged images appear within the imagestream. The OpenShift image registry is a collection of multiple image streams across multiple namespaces. Since image streams contain a collection of related images with the same image name, but different tags, the image stream is analogous to the image repository.
 
 * *Image Tag* is a unique identifier for a version of an image within the image stream or within an enterprise registry.
+
+==== Image registry, repository and tag related to quay.io
+
+If you take a look in quay.io/marrober you are looking at an enterprise registry. Within this registry you will see multiple repositories such as quay.io/marrober/liberty-rest. When you look inside the repository liberty-rest at the url shown below, you will see multiple tags.
+
+[.console-output]
+[source,bash]
+----
+https://quay.io/repository/marrober/liberty-rest?tab=tags
+----
+
+So the relationship is : <registry>/<repository>:<tag>
 
 === Container image creation and management
 
@@ -60,8 +74,68 @@ image::11-03-developer-topology-view.png[Developer topology view,800,align="cent
 
 The menu on the left hand side of the screen shows a number of developer centric operations such as viewing a build configuration to execute a build. There are also options to view config maps and secrets too. These are typical things that developers will do. The menu items we need for the image registry are actually on the administrator menu. While your role may not fit that description exactly, there are some tasks that you need to do that are described in this way. Switch the perspective to the administrator perspective using the option on the top left of the screen by clicking on the word 'Developer'.
 
-The administrator perspective is shown below. The project that you can see will depend on your user number - %PROJECT%.
+The administrator perspective is shown below. The project that you can see will depend on your user number. User3 is shown in the screen images here, for example.
 
 image::11-04-administrator-view.png[Administrator view,800,align="center"]
 
-ff
+From the administrator perspective shown above select the Build menu on the right hand side and then select the ImageStreams sub menu. The result will appear similar the image below depending on how many applications have been added to the topology. There will be one imagestream for each deployment.
+
+image::11-05-image-streams.png[Image streams (gui),800,align="center"]
+
+
+
+
+
+
+
+
+=== Command line interaction with container registry
+
+The 'oc' command has been used for a number of operations so far to examine resources created within the cluster. This can also be used for viewing and manipulating image streams. To view an the image streams that exist within a namespace use the command below :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get imagestream
+----
+
+The above command can be abreviated to save typing to simply:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get is
+----
+
+The result of the above command will be similar to that which is shown below:
+
+[source,bash,subs="+attributes"]
+----
+NAME              IMAGE REPOSITORY                                                                TAGS   UPDATED
+{app-1}   default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%/%PROJECT%/{app-1}
+{app-1}   default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%/%PROJECT%/{app-2}
+----
+
+In a similar manner to other commands used previously the 'oc get' command can be used to get detailed information about the resource in either yaml or json format usng the -o yaml and -o json arguments respectively. Use the command below to get details of one of the image streams paying particular attention to the 'app.openshift.io/vcs-uri' metadata which shows the version control repository URL that was used to create the image within the image stream.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get imagestream/{app-1} -o json
+----
+
+***** Get image tags with command line
+
+== Using Podman to interact with a container image
+
+Podman is an open source project that can be used to interact with container images. The podman command contains a number of sub commands for the creation, management and local execution of container images. In order for anyone to interact with container images stored within the OpenShift image streams the OpenShift image registry must be made visible on an external route. This is an administrator task and you can see if you can use the images from Podman by trying to login to the registry from the Podman command line using the command shown below :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%
+----
+
+The above command is interesting because it uses your user id, taken from the command 'oc whoami' and it also uses a generated token to authenticate you from the command 'oc whoami -t'. try out 'oc whoami -t' on the command line alone if you want to see what the token looks like.
+
+Now that you are authenticated to the OpenShift registry you can interact with the container images.
