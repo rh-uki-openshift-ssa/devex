@@ -99,7 +99,7 @@ A container is created from a dockerfile. The dockerfile is a text document that
 
 Podman is a command line utility for the creation, execution and management of container images. Podman can be used to execute a dockerfile to construct a new container which will be held locally once created. The container image can then be executed locally for initial testing before being pushed to a container registry for storage such that it can be used by other systems. Podman is an open source project that is free to use and further information can be found https://podman.io[here].
 
-The podman command contains a number of sub commands for the creation, management and local execution of container images. To see the full list of commands simply execute 'podman --help' in the new terminal window. This will show a set of sub-commands. To see the details of how to use a specific sub-command (for example the 'create' command) use 'podman create --help'.
+The podman command contains a number of sub commands for the various operations that it can perform. To see the full list of commands simply execute 'podman --help' in the new terminal window. This will show a set of sub-commands. To see the details of how to use a specific sub-command (for example the 'create' command) use 'podman create --help'.
 
 
 
