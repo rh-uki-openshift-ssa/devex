@@ -78,16 +78,11 @@ The administrator perspective is shown below. The project that you can see will 
 
 image::11-04-administrator-view.png[Administrator view,800,align="center"]
 
-From the administrator perspective shown above select the Build menu on the right hand side and then select the ImageStreams sub menu. The result will appear similar the image below depending on how many applications have been added to the topology. There will be one imagestream for each deployment.
+From the administrator perspective shown above select the Build menu on the left hand side and then select the ImageStreams sub menu. The result will appear similar the image below depending on how many applications have been added to the topology. There will be one imagestream for each deployment.
 
 image::11-05-image-streams.png[Image streams (gui),800,align="center"]
 
-
-
-
-
-
-
+Select one of the image streams using the link on the name. Scroll down to see the tag information which will include the SHA for the image too. The SHA of the container image can be viewed for any deployed pod using the web user interface by selecting the following menu elements from the administrator view : Workloads -> Pods -> <select a pod for {app-1} -> scroll down to the containers section and select the container link -> scroll down to the image details and you will see the image stream from which the container was pulled which includes the full SHA. If the SHA's match then you know that the pod is up to date.
 
 === Command line interaction with container registry
 
@@ -116,7 +111,7 @@ NAME              IMAGE REPOSITORY                                              
 {app-1}   default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%/%PROJECT%/{app-2}
 ----
 
-In a similar manner to other commands used previously the 'oc get' command can be used to get detailed information about the resource in either yaml or json format usng the -o yaml and -o json arguments respectively. Use the command below to get details of one of the image streams paying particular attention to the 'app.openshift.io/vcs-uri' metadata which shows the version control repository URL that was used to create the image within the image stream.
+In a similar manner to other commands used previously, the 'oc get' command can be used to display detailed information about the resource in either yaml or json format using the -o yaml and -o json arguments respectively. Use the command below to get details of one of the image streams paying particular attention to the 'app.openshift.io/vcs-uri' metadata which shows the version control repository URL that was used to create the image within the image stream.
 
 [.console-input]
 [source,bash,subs="+attributes"]
@@ -124,18 +119,65 @@ In a similar manner to other commands used previously the 'oc get' command can b
 oc get imagestream/{app-1} -o json
 ----
 
-***** Get image tags with command line
+Image tag information is displayed in the above information too, as shown below. Note that there is just one tag in the list called 'latest' but the information below shows that it has been built three times and the latest tag has been overwritten each time. If you use an https://cloud.redhat.com/blog/guide-to-openshift-pipelines-part-1-introducing-openshift-pipelines[OpenShift Pipeline], based on the open source Tekton project, to build a container image you can be specific about the tag used and this will generate many images with unique tags in the image stream.
 
-== Using Podman to interact with a container image
+[.console-input]
+[source]
+----
+"tags": [
+    {
+        "items": [
+            {
+                "created": "2022-11-04T15:35:28Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:7fb56bfa3a237c84a287064b6d832470e03a55dfd6b7d71990e9c750b6a6ce1b",
+                "generation": 1,
+                "image": "sha256:7fb56bfa3a237c84a287064b6d832470e03a55dfd6b7d71990e9c750b6a6ce1b"
+            },
+            {
+                "created": "2022-11-04T14:47:02Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:f4486b0f00e7459e331483e2ffa34295a69173656df89ee9a218f30f1ef1bd1b",
+                "generation": 1,
+                "image": "sha256:f4486b0f00e7459e331483e2ffa34295a69173656df89ee9a218f30f1ef1bd1b"
+            },
+            {
+                "created": "2022-11-04T14:17:56Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:22830476a899f6724f571cc572ea5580f590d8475ce67f67508aaf64044521da",
+                "generation": 1,
+                "image": "sha256:22830476a899f6724f571cc572ea5580f590d8475ce67f67508aaf64044521da"
+            }
+        ],
+        "tag": "latest"
+    }
+----
 
-Podman is an open source project that can be used to interact with container images. The podman command contains a number of sub commands for the creation, management and local execution of container images. In order for anyone to interact with container images stored within the OpenShift image streams the OpenShift image registry must be made visible on an external route. This is an administrator task and you can see if you can use the images from Podman by trying to login to the registry from the Podman command line using the command shown below :
+to view just the tag you can use a more specific varient of the command from above using a specific jsonpath component as shown below:
 
 [.console-input]
 [source,bash,subs="+attributes"]
 ----
-podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%
+oc get imagestream/{app-1} -o jsonpath='{.status.tags[*].tag}{"\n"}'
 ----
 
-The above command is interesting because it uses your user id, taken from the command 'oc whoami' and it also uses a generated token to authenticate you from the command 'oc whoami -t'. try out 'oc whoami -t' on the command line alone if you want to see what the token looks like.
+== Deploying an application from an image stream
 
-Now that you are authenticated to the OpenShift registry you can interact with the container images.
+To create a new deployment from the image stored within an image stream perform the following steps.
+
+Select the developer context from the top left hand side of the user interface, then select the topology view.
+
+Right click within the grey box that contains the two deployments that have been created already called {app-1} and {app-2}. From the popup menu select Add to application and then select 'Container image' as the source of the deployment.
+
+Previously when you have used this you pasted the url for a container image repository into the field next to the currently selected option, shown below.
+
+image::11-06-image-selection.png[Image selection,800,align="center"]
+
+This time, however, you need to change the selection to use the option "Image stream tag from internal registry". Selecying this option will change the screen as shown below.
+
+image::11-07-image-selection-from-is.png[Image selection from image stream,800,align="center"]
+
+The above allows users to select images held in image streams in other projects on the OpenShift cluster as long as the user has been granted permission to pull the image from that project.
+
+Leave the project set to your current project and select {app-1} from the Image stream drop down box. Select the 'latest' tag and then provide a name of {app-3} for the deployment. Leave all other fields the same and click the blue 'Create' button.
+
+Click on the icon for the new deployment in the topology view to display the pop out menu on the right. You will see the build information for the deployment that is associated with the image stream that was used, although a build will not be running.
+
+Initially the deployment is created with zero pods. Click on the details section of the pop out menu on the right and scale the deployment to 1 pod. You will then see the application start to run a pod.

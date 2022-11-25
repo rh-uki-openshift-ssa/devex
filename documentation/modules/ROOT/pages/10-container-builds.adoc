@@ -1,1 +1,19 @@
-text body
+
+
+
+
+
+
+== Using Podman to interact with a container image
+
+Podman is an open source project that can be used to interact with container images. The podman command contains a number of sub commands for the creation, management and local execution of container images. In order for anyone to interact with container images stored within the OpenShift image streams the OpenShift image registry must be made visible on an external route. This is an administrator task and you can see if you can use the images from Podman by trying to login to the registry from the Podman command line using the command shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%
+----
+
+The above command is interesting because it uses your user id, taken from the command 'oc whoami' and it also uses a generated token to authenticate you from the command 'oc whoami -t'. try out 'oc whoami -t' on the command line alone if you want to see what the token looks like.
+
+Now that you are authenticated to the OpenShift registry you can interact with the container images.
