@@ -1,1 +1,134 @@
-text body
+= The Container Build Process
+:navtitle: The ContainerBuild Process
+:source-highlighter: rouge
+
+image::10-01-container-build-process.png[Container Build Process,600,align="center"]
+
+== The Container Build Process
+
+====
+*What will you learn?*
+
+This module will introduce you to the concepts of creating new container images.
+
+This module will also cover the use of Podman to push container images to external registries.
+
+After completing the module you will understand how to create, run and manage container images.
+====
+
+=== *Pre-Requisites*
+
+In order to undertake the module you need to be logged onto the cluster and have access to a project.
+
+Ensure that the two text boxes at the top of page contain the Cluster address provided by the workshop facilitators and the project you have been assigned. Remember to press *RETURN* after entering text into each field.
+
+This module requires the use of a Podman executable that is not installed in the web terminal that you have used so far. Rather than ask you to install additional software on yor machine, we have made Podman (and other executables you need) available in a new container image that you can run in your project. Once this container is running you can open a terminal to it and execute the required commands.
+
+==== Setting up the new terminal
+
+The container image for the new terminal is available quay.io/marrober/devex-terminal-4:full-terminal-1.1[here]. Feel free to browse to this location in a browser to take a look at the image repository.
+
+To use the image you need to create a new deployment from a container image usng the following steps.
+
+Switch to the developer context and select the topology view. Right click on the main body of the window outside the box that contains your applications and select 'Add to project'  and then from the sub menu select 'Container image'. Copy the container image url from the field below and paste it in to the field labelled '
+Image name from external registry'.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+quay.io/marrober/devex-terminal-4:full-terminal-1.1
+----
+
+Give the deployment a name of 'devex-terminal' and for the 'Application' field select 'No application group'.
+
+Wait for the deployment to complete and then open the route to the application. This will open a new browser tab with a Linux command line client.
+
+The configuration is almost complete, all you have to do now is login as the appropriate user. Switch back to the OpenShift web user interface browser tab and select your username at the top right of the window, as shown below.
+
+image::10-02-get-login-command.png[Get the login command,600,align="center"]
+
+Select "Copy login command" and provide the username and password that you were given at the start of the workshop. From the new browser tab window select "Dislpay Token" which will show you the following information (with your specific token) :
+
+[source]
+----
+Your API token is
+
+sha256~<hidden>-V5I_1g
+
+Log in with this token
+
+oc login --token=sha256~<hidden>V5I_1g --server=https://<cluster-name>:6443
+
+Use this token directly against the API
+
+curl -H "Authorization: Bearer sha256~<hidden>V5I_1g" "https://<cluster-name>:6443/apis/user.openshift.io/v1/users/~"
+
+Request another token
+----
+
+From within your new browser page highlight and copy the line beginning 'oc'. You may close the authentication browser tab after copying the required content. Paste this information into the terminal window in the other browser tab usnig the keys <shift> + <control> and v.
+
+Select 'y' for the prompt regarding insecure connections. You should then see something similar to the following:
+
+[source]
+----
+Logged into "<cluster-api-address>" as "%PROJECT%" using the token provided.
+
+You have access to 1 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "%PROJECT%".
+Welcome! See 'oc help' to get started.
+bash-5.2$
+----
+
+You are now ready to use the terminal. When the instructions ask you to copy and execute a command, please run those commands in the new terminal window.
+
+== Introducing Container Creation
+
+A container is created from a dockerfile. The dockerfile is a text document that consists of a series of commands to add content and configure the container image. The commands begin with a 'FROM' command that indicates the container from which the new container will be constructed. Subsequent commands may include:
+
+* *RUN* - To run a command within the container such as installing a new binary with dnf or yum.
+* *EXPOSE* - To expose a port from within the container to the external environment.
+* *USER* - Specify the user ID to be used to run the subsequent commands. It is best to run container images as a non-root user whenever possible. However, during installation processes it is often best to set the root user, then install applications, and then switch to a lower user for the execution of the command that will be used to run the container.
+* *ADD* - To add files to the container image filesystem from either the local filesystem or a URL. If a tar file is specified from the local filesystem then the file will be expanded within the container filesystem automatically.
+* *COPY* - To copy files in to the container image filesystem from the local filesystem only.
+* *ENTRYPOINT* - The command to run when the container is started.
+* *CMD* - Command line arguments to the above command.
+
+== Introducing Podman
+
+Podman is a command line utility for the creation, execution and management of container images. Podman can be used to execute a dockerfile to construct a new container which will be held locally once created. The container image can then be executed locally for initial testing before being pushed to a container registry for storage such that it can be used by other systems. Podman is an open source project that is free to use and further information can be found https://podman.io[here].
+
+The podman command contains a number of sub commands for the various operations that it can perform. To see the full list of commands simply execute 'podman --help' in the new terminal window. This will show a set of sub-commands. To see the details of how to use a specific sub-command (for example the 'create' command) use 'podman create --help'.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+== -----------------------------------------------------------------
+In order for anyone to interact with container images stored within the OpenShift image streams the OpenShift image registry must be made visible on an external route. This is an administrator task and you can see if you can use the images from Podman by trying to login to the registry from the Podman command line using the command shown below.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%
+----
+
+The above command is interesting because it uses your user id, taken from the command 'oc whoami' and it also uses a generated token to authenticate you from the command 'oc whoami -t'. try out 'oc whoami -t' on the command line alone if you want to see what the token looks like.
+
+Now that you are authenticated to the OpenShift registry you can interact with the container images.
