@@ -30,13 +30,27 @@ The purpose of the image registry is to store container images for use on the Op
 
 A number of terms are used when describing the image registry within OpenShift.
 
-* *Registry* is used to describe an instance of something that can hold multiple container images. As you will soon see the notion of a 'registry' in OpenShift is actually an entity that is split across multiple items within the cluster, rather than being a single entity.
+* *Registry* is used to describe an instance of something that can hold multiple container images in different repositories. As you will soon see the notion of a 'registry' in OpenShift is actually split across a number of repositories.
 
 * *Enterprise Registry* is used to refer to a registry that exists within a third party solution purely for the purpose of storing, cataloguing and serving images.
 
-* *Image Stream* is an entity that exists within a namespace of an OpenShift cluster for the storage of one or more container images. Generally a separate imagestream is used for each specific image. As the software evolves and new container images are built, new tagged images appear within the imagestream. The OpenShift image registry is a collection of multiple image streams across multiple namespaces.
+* *Image Repository* is a collection of related images that have the same name but have different tags to denote specific versions of the container image.
+
+* *Image Stream* is an entity that exists within a namespace of an OpenShift cluster for the storage of one or more container images. Generally a separate imagestream is used for each specific image. As the software evolves and new container images are built, new tagged images appear within the imagestream. The OpenShift image registry is a collection of multiple image streams across multiple namespaces. Since image streams contain a collection of related images with the same image name, but different tags, the image stream is analogous to the image repository.
 
 * *Image Tag* is a unique identifier for a version of an image within the image stream or within an enterprise registry.
+
+==== Image registry, repository and tag related to quay.io
+
+If you take a look in quay.io/marrober you are looking at an enterprise registry. Within this registry you will see multiple repositories such as quay.io/marrober/liberty-rest. When you look inside the repository liberty-rest at the url shown below, you will see multiple tags.
+
+[.console-output]
+[source,bash]
+----
+https://quay.io/repository/marrober/liberty-rest?tab=tags
+----
+
+So the relationship is : <registry>/<repository>:<tag>
 
 === Container image creation and management
 
@@ -60,8 +74,110 @@ image::11-03-developer-topology-view.png[Developer topology view,800,align="cent
 
 The menu on the left hand side of the screen shows a number of developer centric operations such as viewing a build configuration to execute a build. There are also options to view config maps and secrets too. These are typical things that developers will do. The menu items we need for the image registry are actually on the administrator menu. While your role may not fit that description exactly, there are some tasks that you need to do that are described in this way. Switch the perspective to the administrator perspective using the option on the top left of the screen by clicking on the word 'Developer'.
 
-The administrator perspective is shown below. The project that you can see will depend on your user number - %PROJECT%.
+The administrator perspective is shown below. The project that you can see will depend on your user number. User3 is shown in the screen images here, for example.
 
 image::11-04-administrator-view.png[Administrator view,800,align="center"]
 
-ff
+From the administrator perspective shown above select the Build menu on the left hand side and then select the ImageStreams sub menu. The result will appear similar the image below depending on how many applications have been added to the topology. There will be one imagestream for each deployment.
+
+image::11-05-image-streams.png[Image streams (gui),800,align="center"]
+
+Select one of the image streams using the link on the name. Scroll down to see the tag information which will include the SHA for the image too. The SHA of the container image can be viewed for any deployed pod using the web user interface by selecting the following menu elements from the administrator view : Workloads -> Pods -> <select a pod for {app-1} -> scroll down to the containers section and select the container link -> scroll down to the image details and you will see the image stream from which the container was pulled which includes the full SHA. If the SHA's match then you know that the pod is up to date.
+
+=== Command line interaction with container registry
+
+The 'oc' command has been used for a number of operations so far to examine resources created within the cluster. This can also be used for viewing and manipulating image streams. To view an the image streams that exist within a namespace use the command below :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get imagestream
+----
+
+The above command can be abreviated to save typing to simply:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get is
+----
+
+The result of the above command will be similar to that which is shown below:
+
+[source,bash,subs="+attributes"]
+----
+NAME              IMAGE REPOSITORY                                                                TAGS   UPDATED
+{app-1}   default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%/%PROJECT%/{app-1}
+{app-1}   default-route-openshift-image-registry.%CLUSTER_SUBDOMAIN%/%PROJECT%/{app-2}
+----
+
+In a similar manner to other commands used previously, the 'oc get' command can be used to display detailed information about the resource in either yaml or json format using the -o yaml and -o json arguments respectively. Use the command below to get details of one of the image streams paying particular attention to the 'app.openshift.io/vcs-uri' metadata which shows the version control repository URL that was used to create the image within the image stream.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get imagestream/{app-1} -o json
+----
+
+Image tag information is displayed in the above information too, as shown below. Note that there is just one tag in the list called 'latest' but the information below shows that it has been built three times and the latest tag has been overwritten each time. If you use an https://cloud.redhat.com/blog/guide-to-openshift-pipelines-part-1-introducing-openshift-pipelines[OpenShift Pipeline], based on the open source Tekton project, to build a container image you can be specific about the tag used and this will generate many images with unique tags in the image stream.
+
+[.console-input]
+[source]
+----
+"tags": [
+    {
+        "items": [
+            {
+                "created": "2022-11-04T15:35:28Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:7fb56bfa3a237c84a287064b6d832470e03a55dfd6b7d71990e9c750b6a6ce1b",
+                "generation": 1,
+                "image": "sha256:7fb56bfa3a237c84a287064b6d832470e03a55dfd6b7d71990e9c750b6a6ce1b"
+            },
+            {
+                "created": "2022-11-04T14:47:02Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:f4486b0f00e7459e331483e2ffa34295a69173656df89ee9a218f30f1ef1bd1b",
+                "generation": 1,
+                "image": "sha256:f4486b0f00e7459e331483e2ffa34295a69173656df89ee9a218f30f1ef1bd1b"
+            },
+            {
+                "created": "2022-11-04T14:17:56Z",
+                "dockerImageReference": "image-registry.openshift-image-registry.svc:5000/user3/layer-1@sha256:22830476a899f6724f571cc572ea5580f590d8475ce67f67508aaf64044521da",
+                "generation": 1,
+                "image": "sha256:22830476a899f6724f571cc572ea5580f590d8475ce67f67508aaf64044521da"
+            }
+        ],
+        "tag": "latest"
+    }
+----
+
+to view just the tag you can use a more specific varient of the command from above using a specific jsonpath component as shown below:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+oc get imagestream/{app-1} -o jsonpath='{.status.tags[*].tag}{"\n"}'
+----
+
+== Deploying an application from an image stream
+
+To create a new deployment from the image stored within an image stream perform the following steps.
+
+Select the developer context from the top left hand side of the user interface, then select the topology view.
+
+Right click within the grey box that contains the two deployments that have been created already called {app-1} and {app-2}. From the popup menu select Add to application and then select 'Container image' as the source of the deployment.
+
+Previously when you have used this you pasted the url for a container image repository into the field next to the currently selected option, shown below.
+
+image::11-06-image-selection.png[Image selection,800,align="center"]
+
+This time, however, you need to change the selection to use the option "Image stream tag from internal registry". Selecying this option will change the screen as shown below.
+
+image::11-07-image-selection-from-is.png[Image selection from image stream,800,align="center"]
+
+The above allows users to select images held in image streams in other projects on the OpenShift cluster as long as the user has been granted permission to pull the image from that project.
+
+Leave the project set to your current project and select {app-1} from the Image stream drop down box. Select the 'latest' tag and then provide a name of {app-3} for the deployment. Leave all other fields the same and click the blue 'Create' button.
+
+Click on the icon for the new deployment in the topology view to display the pop out menu on the right. You will see the build information for the deployment that is associated with the image stream that was used, although a build will not be running.
+
+Initially the deployment is created with zero pods. Click on the details section of the pop out menu on the right and scale the deployment to 1 pod. You will then see the application start to run a pod.
