@@ -1,8 +1,9 @@
-FROM registry.redhat.io/rhel8/nodejs-14
+FROM quay.io/marrober/rhel8-nodejs-14:latest
 COPY layer.js /opt/app-root/src/layer.js
 COPY node_modules/ /opt/app-root/src/node_modules/
 USER 0
 RUN chmod a+w /var/log
 USER 1001
+EXPOSE 8080
 ENTRYPOINT ["node"]
-CMD ["/opt/app-root/src/layer.js"]
+CMD ["/opt/app-root/src/layer.js",  "> /var/log/output.log &"]

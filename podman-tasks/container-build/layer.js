@@ -3,6 +3,9 @@ const express = require('express');
 const sprintfJS = require('sprintf-js');
 var ip = require("ip");
 const app = express();
+var fs = require('fs');
+
+var stream = fs.createWriteStream(`layer.log`);
 
 /* API endpoints ......
     /             - Get the IP address of the current layer.
@@ -34,6 +37,8 @@ console.log("phase: setup", "This app target port : " + port);
 console.log("phase: setup", "This app ip address  : " + ip.address());
 
 console.log("Application is starting......");
+stream.write("Layer app starting!\n\n");
+
 var counter = 0;
 
 var nextServiceClusterIP = [];
@@ -60,7 +65,7 @@ if (typeof serviceNames != 'undefined') {
       console.log("next service ip address : " + nextServiceClusterIP);
       console.log("phase: setup", "next interface service host : " + nextServiceClusterIP);
     });
-  } 
+  }
 
   console.log("next interface service port : " + nextServicePort);
   console.log("phase: setup", "next interface service port : " + nextServicePort);
@@ -85,6 +90,7 @@ app.get('/', (request, response) => {
   counter++;
   messageText = sprintfJS.sprintf("this ip address %-15s  %04d", ip.address(), counter);
   console.log("phase: root", messageText);
+  stream.write(messageText + "\n");
   response.send(messageText + "\n");
 });
 
@@ -104,7 +110,7 @@ app.get('/call-layers', (request, response) => {
 
     if ( typeof username == 'undefined') {
       username = "-";
-    } else { 
+    } else {
       console.log("Username : ", username);
     }
 
@@ -252,7 +258,7 @@ function sendNextRequest(cb) {
       cb(true, dataResponse, res.statusCode);
     });
   });
-  
+
   request.on("error", (err) => {
     console.log("Error : " + err.message);
   });

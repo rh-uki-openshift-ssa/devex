@@ -47,7 +47,7 @@ The configuration is almost complete, all you have to do now is login as the app
 
 image::10-02-get-login-command.png[Get the login command,600,align="center"]
 
-Select "Copy login command" and provide the username and password that you were given at the start of the workshop. From the new browser tab window select "Dislpay Token" which will show you the following information (with your specific token) :
+Select "Copy login command" and provide the username and password that you were given at the start of the workshop. From the new browser tab window select "Display Token" which will show you the following information (with your specific token) :
 
 [source]
 ----
@@ -104,8 +104,37 @@ The podman command contains a number of sub commands for the various operations 
 
 
 
+apiVersion: v1
+kind: Pod
+metadata:
+ name: podman-priv
+spec:
+ containers:
+   - name: priv
+     image: quay.io/podman/stable
+     args:
+       - sleep
+       - "1000000"
+     securityContext:
+       privileged: true
 
 
+
+       apiVersion: v1
+       kind: Pod
+       metadata:
+        name: podman-priv
+        label:
+          app: podman-priv
+       spec:
+        containers:
+          - name: priv
+            image: quay.io/marrober/devex-podman:1
+            args:
+              - sleep
+              - "1000000"
+            securityContext:
+              privileged: true
 
 
 
