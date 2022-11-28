@@ -4,7 +4,7 @@
 [#ephemeral_container_storage]
 == Ephemeral Container Storage
 
-Containers by their nature are ephemeral – they are should lived compute units with no data persistence. Any data a container works with or produces is held within runtime memory – as a result of which stopping or restarting a container results in data loss.
+Containers by their nature are ephemeral – they are short lived compute units with no data persistence. Any data a container works with or produces is held within runtime memory – as a result of which stopping or restarting a container results in data loss.
 
 Although containers appear to have a file system, this by default is an in memory file system. In the following screen shot, you can see the root directory structure from within our container, which is used by our java application - this is all within volatile memory.
 
@@ -69,14 +69,69 @@ A PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar 
 [#build_our_app]
 == Build our App
 
+To demonstrate how to use container storage with OpenShift, we will start by deploying a very simple web application container onto our cluster, and then interact with the local filesystem on that container via the terminal. To begin with, we will create a new project in OpenShift for this experiment. Fromt the developer view within OpenShift, click the drop down towards the top of the window and then select "Create Project"
+
+image::08-02-create-project.png[container root filesystem,300,align="center"]
+
+We will call this project:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+bootcamp-webserver
+----
+
+
+image::08-03-create-project-name.png[Enter a project name,400,align="center"]
+
+
+With a blank project created, we will now create a deployment from the developer view, using the import from git strategy. We will also specify a container file which will define and create our application for us. Start by slecting the "Import from Git" option (make sure you are in "Developer View") as shown below:
+
+image::08-04-import-from-git.png[import from git,300,align="center"]
+
+We will now enter the git repository url that contains the code we are going to deploy to our cluster:
+
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+https://github.com/mkimberley/bootcamp_webserver.git
+----
+
+image::08-05-git-repo-name.png[container root filesystem,700,align="center"]
+
+We now need to tell OpenShift that we wish to specify a container file. The file "Containerfile" is at the root of the git repository we are using, and contains the build steps to make our container image.
+
+
+
+image::08-06-containerfile.png[container root filesystem,700,align="center"]
+
+
 
 
 [#test_storage_persistance]
 == Test our Storage persistance
 
+
+
 === Step 1 - Without a Persistent Volume
 
+image::08-07-verify-test.png[container root filesystem,700,align="center"]
+
+image::08-08-scale-down-pod.png[container root filesystem,300,align="center"]
+
+image::08-09-scale-up-pod.png[container root filesystem,300,align="center"]
+
+image::08-10-test-persistence.png[container root filesystem,700,align="center"]
+
+
 === Step 2 - With a Persistent Voume
+
+image::08-11b-deployment-storage.png[container root filesystem,700,align="center"]
+
+image::08-12-pvc-post-scale.png[container root filesystem,700,align="center"]
+
+image::08-13-testing-pvc.png[container root filesystem,700,align="center"]
 
 [#add_storage_to_workshop]
 == Adding a persistent volume to our Bootcamp app
