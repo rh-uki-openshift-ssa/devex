@@ -4,8 +4,6 @@ RUN mkdir /workspace && chmod 777 workspace
 
 WORKDIR /workspace
 
-COPY container-build /workspace/container-build
-
 RUN dnf install -y git
 
 RUN dnf -y install npm container-selinux

@@ -1,9 +1,0 @@
-FROM quay.io/podman/stable
-
-RUN mkdir /workspace && chmod 777 workspace
-
-WORKDIR /workspace
-
-COPY container-build /workspace/container-build
-
-USER 1001
