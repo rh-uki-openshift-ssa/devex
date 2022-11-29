@@ -6,4 +6,4 @@ RUN chmod a+w /var/log
 USER 1001
 EXPOSE 8080
 ENTRYPOINT ["node"]
-CMD ["/opt/app-root/src/layer.js",  "> /var/log/output.log &"]
+CMD ["/opt/app-root/src/layer.js"]
