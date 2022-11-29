@@ -151,7 +151,7 @@ RUN chmod a+w /var/log
 USER 1001
 EXPOSE 8080
 ENTRYPOINT ["node"]
-CMD ["/opt/app-root/src/layer.js",  "> /var/log/output.log &"]
+CMD ["/opt/app-root/src/layer.js"]
 ----
 
 Now that you have seen the content of the application files, the dockerfile will make more sense. The lines of the dockerfile will perform the follwowing tasks.
@@ -183,4 +183,166 @@ Use the following command to build the container image and give it the specific 
 podman build -f dockerfile -t my-container:1
 ----
 
-List the images present again to confirm that it was created.
+you should see information similar to below scrolling up the screen.
+
+[source]
+----
+STEP 1/9: FROM quay.io/marrober/rhel8-nodejs-14:latest
+Trying to pull quay.io/marrober/rhel8-nodejs-14:latest...
+Getting image source signatures
+Copying blob 36bd4b53f38f done
+Copying blob c8408bdc0540 done
+Copying blob 75800ed868ab done
+Copying config 05f757ba35 done
+Writing manifest to image destination
+Storing signatures
+STEP 2/9: COPY layer.js /opt/app-root/src/layer.js
+--> b53decbe08a
+STEP 3/9: COPY node_modules/ /opt/app-root/src/node_modules/
+--> 951d87ec2a8
+STEP 4/9: USER 0
+--> 56407f58933
+STEP 5/9: RUN chmod a+w /var/log
+--> 1913f829bb3
+STEP 6/9: USER 1001
+--> 3623e5dddb7
+STEP 7/9: EXPOSE 8080
+--> 01e9de30f1b
+STEP 8/9: ENTRYPOINT ["node"]
+--> a6d234e49df
+STEP 9/9: CMD ["/opt/app-root/src/layer.js"]
+COMMIT my-container:1
+--> 4be5f616c1b
+Successfully tagged localhost/my-container:1
+4be5f616c1bec61bf1a1e713d78bf0ff2a810e9e6bed34fbffdbdba8cc8cd7bf
+----
+
+List the images present again to confirm that it was created. The 'podman images' command will now show two container images as indicated below.
+
+[source]
+----
+REPOSITORY                        TAG         IMAGE ID      CREATED         SIZE
+localhost/my-container            1           4be5f616c1be  56 seconds ago  656 MB
+quay.io/marrober/rhel8-nodejs-14  latest      05f757ba35cb  3 weeks ago     642 MB
+----
+
+The above indicates that the input image specified in the FROM command of the dockerfile has been pulled and is present in the Podman registry. The container created has the repository location of 'localhost' to indicate that it is present in the local registry.
+
+=== Execute the container locally
+
+To execute the container use the 'podman run' command. This is not to be confused with 'podman execute'. The run command is used to run a container image. The exeucte command is used to execute a single command that is present within an already running container image.
+
+Podman run takes many arguments for configuring the environment of the container and the manner in which it will run. For this exercise you will use the following options.
+
+* *-d* - To run the container in a detached mode and return to the command prompt.
+* *-t* - To allocate a pseudo-TTY for container
+* *--name* - Asign a name to the running container. Podman will allocate a random name made up of two words if you don't give it a name. You can also interact with the running container later using the container instance tag.
+
+Execute the container with the command.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman run -dt --name my-running-container localhost/my-container:1
+----
+
+The result of running this command will be the container instance ID similar to :
+
+[source]
+----
+f035db500603330b9d00744affa55c609b5514fc184f3ad6d8940c7d64bf5caf
+----
+
+To view the running containers use the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman ps
+----
+
+This will show the running container as below :
+
+[source]
+----
+CONTAINER ID  IMAGE                     COMMAND               CREATED             STATUS                 PORTS       NAMES
+f035db500603  localhost/my-container:1  /opt/app-root/src...  About a minute ago  Up About a minute ago              my-running-container
+----
+
+The container will be listening on the localhost ip address of the container in which we are running Podman on port 8080. If you switch back to the browser tab where we failed to connect to the application at the start of this section and refresh the browser you should now see text similar to that below.
+
+[source]
+----
+this ip address 10.130.0.138 0001
+----
+
+The above proves that the container is running and listening on the port 8080.
+
+To view the logs of the container use the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman exec my-running-container cat layer.log
+----
+
+Refresh the application in the browser window a few more times to increase the counter and then look at the logs again. You should see something similar to :
+
+[source]
+----
+sh-5.2# podman exec my-running-container cat layer.log
+Layer app starting!
+
+this ip address 10.130.0.138     0001
+this ip address 10.130.0.138     0002
+this ip address 10.130.0.138     0003
+this ip address 10.130.0.138     0004
+this ip address 10.130.0.138     0005
+sh-5.2#
+----
+
+=== Cleaning up
+
+To stop the container instance running use the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman stop my-running-container
+----
+
+The container instance is still present and could be restarted. To view the container instance use the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman ps -a
+----
+
+This will display :
+
+[source]
+----
+CONTAINER ID  IMAGE                     COMMAND               CREATED        STATUS                      PORTS       NAMES
+f035db500603  localhost/my-container:1  /opt/app-root/src...  8 minutes ago  Exited (137) 6 seconds ago              my-running-container
+----
+
+To remove the instance use the command :
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman rm my-running-container
+----
+
+We still have the container images on the system. It is worth cleaning these down periodically as you may end up with quite a lot over a period of time. To clean them down quickly you can combine the listing of the images with the delete command. *BEWARE* This command will remove ALL container images without warning.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+podman rmi $(podman images --format {{.ID}})
+----
+
+=== Extension
+
+If you have spare time and want to experiment further, feel free to make some small changes to the source code of the layers app and then create a new container image and run it. 
