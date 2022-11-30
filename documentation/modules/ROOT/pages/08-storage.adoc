@@ -100,44 +100,208 @@ https://github.com/mkimberley/bootcamp_webserver.git
 
 image::08-05-git-repo-name.png[container root filesystem,700,align="center"]
 
-We now need to tell OpenShift that we wish to specify a container file. The file "Containerfile" is at the root of the git repository we are using, and contains the build steps to make our container image.
+We need to click "Edit imoprt Strategy" and choose "Dockerfile"
 
 
+We now need to tell OpenShift that we wish to specify a container file. The file "Containerfile" is at the root of the git repository we are using, and contains the build steps to make our container image, the contents of which are as follows:
+
+[.console-input]
+[source]
+----
+FROM golang:latest
+
+# Add Maintainer Info
+LABEL maintainer="Matt Kimberley <mattkimberley84@gmail.com>"
+
+# Copy the source
+RUN mkdir /app
+COPY src/ /app
+COPY go.mod /app
+WORKDIR /app
+
+# Build the Go app
+RUN go get github.com/mkimberley/bootcamp_websever
+RUN go get github.com/gin-gonic/gin
+RUN go build -o main .
+
+# Create a working folder
+RUN mkdir /data
+RUN chmod -R 777 /data
+
+# Expose port 8080 to the outside world
+EXPOSE 8080/tcp
+
+# Command to run the executable
+CMD ["/app/main"]
+----
+
+In essence, the above choses a base container image to start from (golang:latest in our case) and then specifies a number of "layers" to add onto that base image which represent our customisation to deploy our application source code.
+
+The last command, defines what the container should do when it is started - in this case, run a binary file called "main" which was compiled by the go compiler during our conatiner build process.
+
+Once the container image is built, OpenShift will store the image in its internal container image repository and then proceed to automatically create the necessary Kubernetes objects to run our container imagine - including the deployment, service and OpenShift route objects. OpenShift builds really simplify the process of getting application code into production quickly for developers.
+
+
+[TIP]
+.A note on Dockerfiles
+====
+You may encounter the term "Dockerfile" which was traditionally used to define how a container image should be built. However, Dockerfiles are now largely superceeded by Containerfiles which are backwards compatible with the traditional Dockerfile. You will learn more about the conatiner build process in section 10 of this course.
+====
+
+Specify the container image file as follows:
 
 image::08-06-containerfile.png[container root filesystem,700,align="center"]
 
 
+Next, we click the blue "Create" button at the bottom of the page that will start the build process.
+
+You will see the application build is in progress:
+
+image::08-06a-building.png[app building,700,align="center"]
 
 
 [#test_storage_persistance]
 == Test our Storage persistance
 
-
+Now that we have a container running inside of OpenShift we can investigate how OpenShift handles storage persistance following on from what we learnt earlier.
 
 === Step 1 - Without a Persistent Volume
 
+Firstly, lets investigate persistance without a Persistent Volume attached to our conatiner. We'll start by accessing the terminal for our running container. We firstly need to ensure that we have switched from "Developer View", to "Administrator View" (Top left drop down menu). Next, choose the menu option "Pods" from the "Workloads" drop down on the left hand side of the screen. You should see two pods, one in a "Running" status and the other in a "Completed" status. Click the name of the pod which has the status "Running".
+
+We now want to access the terminal, so choose that tab.
+
+For this test we are simply going to create a text file on the filesystem, scale the pod down and then back up and see if our change has persisted.
+
+Once in the terminal type the following:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+echo "Testing Persistence" > /data/test.txt
+----
+
+The above command simple creates a text file called "test.txt" in the folder "data", that contains the message "Testing Persistence".
+
+Once that file is created, we'll verify everything went to plan:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+cat /data/test.txt
+----
+
+You should have the message "Testing Persistence" displayed in the terminal window. (We have used cat in this exmaple, to read the contents of test.txt and display to our terminal window)
+
+[TIP]
+.A note on stdin and stdout
+====
+We have just used two linux commands, echo and cat which make use of a input and output streams within Linux known as stdin and stdout. You can read more here:
+http://www.howtogeek.com/435903/what-are-stdin-stdout-and-stderr-on-linux/[stdin, stdout,stderr]
+====
+
+
 image::08-07-verify-test.png[container root filesystem,700,align="center"]
+
+This should not be a suprise at this point, as the container is currently running within the pod. Remember, this filesystem is volatile - it is in memory and not actually persisted to any storage device. We can demonstrate this by "restarting the container". - We don't actually restart containers, we destroy and rebuild them. To do this, we will "scale down" our "deployment". 
+
+Whilst in the "Administrator" view, choose the drop down menu "Workloads" and then selected "Depployments". You should see the deployment that represents our running application listed as "bootcamp-webserver-git". Select the name (which is a link) and you should see beneath "Deployment details" a pair of "up and down" controls. This simply controls how many pods are deployed within the deployment. Scale this down to zero, which will destroy our current running container.
 
 image::08-08-scale-down-pod.png[container root filesystem,300,align="center"]
 
+And next, scale the deployment back up to one, which will re-create our container.
+
 image::08-09-scale-up-pod.png[container root filesystem,300,align="center"]
+
+With the container running again we will re-run our simple test of taking the content of the file "test.txt" and display it on the terminal window. Head over to the terminal window for the newly created container. (Workloads -> Pods -> (select pod) -> Terminal)
+
+And simply enter:
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+cat /data/test.txt
+----
+
+You should see:
 
 image::08-10-test-persistence.png[container root filesystem,700,align="center"]
 
+Which confirms what we have discussed so far. By default, containers are ephemeral and do not have persistent storage. To make useful applications they need to either contect to and external data source (such as a database) or, have a volume mounted to them for persistence.
 
 === Step 2 - With a Persistent Voume
 
+Now we will solve the problem of data persistance by using OpenShift to provide a persistent volume to our container. 
+
+Choose the "Workloads" drop down once more and then select "Deployments". Towards the far right of the window you should be able to see an options menu in the formof a kebab menu.:
+
 image::08-11b-deployment-storage.png[container root filesystem,700,align="center"]
 
+Choose "Add Storage".
+
+Next, we need to configure what type of storage we want to use. We could, use an existing storage claim if we had one but we want to create a new claim. Choose "Create new Claim".
+
+Once we select "Create new claim", we will see a number of options expand. The first option defines our StorageClass. In the screen shot this is of type "gp2" which represents a type of cloud storage in Amazon Web Services (AWS) that is specifc to AWS. StorageClasses allow us to obstract a layer of complexity away for us by not having to worry about the differences between the different combinations of storage and storage vendor. - This could be Auzre, Google Cloud, NetAPP storgae etc - as long as the storage adheres to a set of standards specifically designed for Kubernetes, OpenShift will be able to use it.
+
+We need to name our PersistentVolumeClaim, enter:
+
+[.console-input]
+[source]
+----
+bootcamp-webserver-pvc
+----
+
+Choose a size of 1 GiB.
+
+Next, we will specifiy the mount path. As mentioned earlier, we map a volume to a path inside our container's filesystem. It is the /data directory that we want to make persistent, so enter:
+
+[.console-input]
+[source]
+----
+/data
+----
+
+We should have the following at this stage:
+
+
+
+image::08-11c-add-storage-details.png[storage details,800,align="center"]
+
+Click save. Once the persistant volume claim has been submitted, the OpenShift user interface will switch back to the deployment depicting that a scaling event has started:
+
 image::08-12-pvc-post-scale.png[container root filesystem,700,align="center"]
+
+Once the pod has scaled, we can once again try our test from earlier. Switch to the terminal for the conatiner, and create a text file within the /data folder which we have defined as a persistently mounted volume. As before ammend the deployment to scale the pod down to zero, and then back to one. Investigate and see that the file this time, has persisted.
+
 
 image::08-13-testing-pvc.png[container root filesystem,700,align="center"]
 
 [#add_storage_to_workshop]
 == Adding a persistent volume to our Bootcamp app
 
+For the next stages of this course, we need to add some persistent storage to our bootcampapp deploy. Switch to the project that you deployed the Open JDK Bootcamp application to previously in section three. As before, in Administrator view, choose "Workloads" and then "Deployments".
+
+You should see a deployment similar to the following:
+
+image::08-14-bootcamp-deployment.png[deployment filesystem,700,align="center"]
+
+As before we are going to create a PersistentVolumeClaim using a StorageClass. From the kebab icon menu, choose "Add Storage". We will use the same options as before, however with the PersistentVolumeClaim name:
+
+[.console-input]
+[source]
+----
+bootcampapp-pvc
+----
+
+As follows:
+
+image::08-15-bootcamp-storage-details.png[storage details filesystem,700,align="center"]
+
+After OpenShift scales the pod down and then back up again, the bootcamp application from this point forward will have persistent storage if the /data directory is used within the container's internal filesystem
 
 
-
-
+[NOTE]
+====
+If you would like to learn more in depth about storage within Kubernetes / OpenShift, please read the following documentation provided by the Kubernetes community:
 https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+====
