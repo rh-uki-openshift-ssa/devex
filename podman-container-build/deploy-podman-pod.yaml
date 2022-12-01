@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podman
+  labels:
+    app: podman
+spec:
+  containers:
+  - name: podman
+    image: quay.io/marrober/devex-podman:4
+    args:
+      - sleep
+      - "1000000"
+    securityContext:
+      privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podman-svc
+  labels:
+    app: podman
+spec:
+  ports:
+  - name: http
+    port: 8080
+  selector:
+    app: podman
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: podman
+  name: podman-route
+spec:
+  to:
+    kind: Service
+    name: podman-svc
