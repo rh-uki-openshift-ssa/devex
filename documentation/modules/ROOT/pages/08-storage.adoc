@@ -44,22 +44,22 @@ podman run –-name mycotainer -v /mnt/data:/mnt/database:Z mycontainer-image:v1
 
 When the command above is run, a container called "mycontainer" is started on the host. It uses a container image called "mycontainer-image" with the tag "v1". It also maps the local folder /mnt/data to the folder within the container /mnt/database. The -v switch simply means "volume" and the ":Z" attribute is a security feature which we won't go into at this stage (it involves a security system called SELinux)
 
-Once the container starts, if we were to look inside the container under /mnt/database, we would see that the content of that folder matches /mnt/data on the host. And crucially, we can both read a write data to this folder in real time. 
+Once the container starts, if we were to look inside the container under /mnt/database, we would see that the content of that folder matches /mnt/data on the host. And crucially, we can both read and write data to this folder in real time. 
 
-Now that the /mnt/database has persistence to a real storage device, each time the container stop and starts the pre-existing volume will be mounted and available for consumption by the container. This allows data persistance for any application that we want to design and run within a container eco system.
+Now that the /mnt/database has persistence to a real storage device, each time the container stops and starts the pre-existing volume will be mounted and available for consumption by the container. This allows data persistence for any application that we want to design and run within a container ecosystem.
 
 
 [#openshift_storage]
 == OpenShift Storage
 
-Local storage volumes are great for a small number of containers, but real world deployments of containerised applications can have hundreds if not thousands of containers running that all need persistent storage for data. This would quickly become difficult to manage manually using the methodology we have discussed so far. Happily, kubernetes and thefore Red Hat OpenShift has a technology which makes the provision and management of containerised storage relatively simple. It is called "Persitent Volumes" and "Persistent Volume Claims". A key thing to remember is however, that this technology still makes use of the volume mounts typology that we have breifly discussed "under the hood".
+Local storage volumes are great for a small number of containers, but real world deployments of containerised applications can have hundreds if not thousands of containers running that all need persistent storage for data. This would quickly become difficult to manage manually using the methodology we have discussed so far. Happily, kubernetes and therefore Red Hat OpenShift has a technology which makes the provision and management of containerised storage relatively simple. It is called "Persistent Volumes" and "Persistent Volume Claims". A key thing to remember is however, that this technology still makes use of the volume mounts typology that we have briefly discussed "under the hood".
 
 [#persistent_volumes]
 == Persistent volumes
 
-A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes. A StorageClass provides a way for administrators to describe the "classes" of storage they offer. Beneath the storage class, real storage drives are obsficated from the administrator using a container storage interface.-  This infances takes care of the complicated process of accounting for all of the different types of storage regardless of vendor or cloud platform, making it simple and easy to consume by developers on a Kuberentes platform.
+A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes. A StorageClass provides a way for administrators to describe the "classes" of storage they offer. Beneath the storage class, real storage drives are obsficated from the administrator using a container storage interface.-  This takes care of the complicated process of accounting for all of the different types of storage regardless of vendor or cloud platform, making it simple and easy to consume by developers on a Kuberentes platform.
 
-A persistent volume is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual Pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system.
+A persistent volume is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a life cycle independent of any individual Pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system.
 
 [#persistent_volume_claims]
 == Persistent Volume Claims
@@ -69,7 +69,7 @@ A PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar 
 [#build_our_app]
 == Build our App
 
-To demonstrate how to use container storage with OpenShift, we will start by deploying a very simple web application container onto our cluster, and then interact with the local filesystem on that container via the terminal. To begin with, we will create a new project in OpenShift for this experiment. Fromt the developer view within OpenShift, click the drop down towards the top of the window and then select "Create Project"
+To demonstrate how to use container storage with OpenShift, we will start by deploying a very simple web application container onto our cluster, and then interact with the local filesystem on that container via the terminal. To begin with, we will create a new project in OpenShift for this experiment. From the developer view within OpenShift, click the drop down towards the top of the window and then select "Create Project"
 
 image::08-02-create-project.png[container root filesystem,300,align="center"]
 
@@ -85,7 +85,7 @@ bootcamp-webserver
 image::08-03-create-project-name.png[Enter a project name,400,align="center"]
 
 
-With a blank project created, we will now create a deployment from the developer view, using the import from git strategy. We will also specify a container file which will define and create our application for us. Start by slecting the "Import from Git" option (make sure you are in "Developer View") as shown below:
+With a blank project created, we will now create a deployment from the developer view, using the import from git strategy. We will also specify a container file which will define and create our application for us. Start by selecting the "Import from Git" option (make sure you are in "Developer View") as shown below:
 
 image::08-04-import-from-git.png[import from git,300,align="center"]
 
@@ -100,7 +100,7 @@ https://github.com/mkimberley/bootcamp_webserver.git
 
 image::08-05-git-repo-name.png[container root filesystem,700,align="center"]
 
-We need to click "Edit imoprt Strategy" and choose "Dockerfile"
+We need to click "Edit import Strategy" and choose "Dockerfile"
 
 
 We now need to tell OpenShift that we wish to specify a container file. The file "Containerfile" is at the root of the git repository we are using, and contains the build steps to make our container image, the contents of which are as follows:
@@ -137,7 +137,7 @@ CMD ["/app/main"]
 
 In essence, the above choses a base container image to start from (golang:latest in our case) and then specifies a number of "layers" to add onto that base image which represent our customisation to deploy our application source code.
 
-The last command, defines what the container should do when it is started - in this case, run a binary file called "main" which was compiled by the go compiler during our conatiner build process.
+The last command defines what the container should do when it is started - in this case, run a binary file called "main" which was compiled by the go compiler during our container build process.
 
 Once the container image is built, OpenShift will store the image in its internal container image repository and then proceed to automatically create the necessary Kubernetes objects to run our container imagine - including the deployment, service and OpenShift route objects. OpenShift builds really simplify the process of getting application code into production quickly for developers.
 
@@ -145,7 +145,7 @@ Once the container image is built, OpenShift will store the image in its interna
 [TIP]
 .A note on Dockerfiles
 ====
-You may encounter the term "Dockerfile" which was traditionally used to define how a container image should be built. However, Dockerfiles are now largely superceeded by Containerfiles which are backwards compatible with the traditional Dockerfile. You will learn more about the conatiner build process in section 10 of this course.
+You may encounter the term "Dockerfile" which was traditionally used to define how a container image should be built. However, Dockerfiles are now largely superseded by Containerfiles which are backwards compatible with the traditional Dockerfile. You will learn more about the container build process in section 10 of this course.
 ====
 
 Specify the container image file as follows:
@@ -163,11 +163,11 @@ image::08-06a-building.png[app building,700,align="center"]
 [#test_storage_persistance]
 == Test our Storage persistance
 
-Now that we have a container running inside of OpenShift we can investigate how OpenShift handles storage persistance following on from what we learnt earlier.
+Now that we have a container running inside of OpenShift we can investigate how OpenShift handles storage persistence following on from what we learnt earlier.
 
 === Step 1 - Without a Persistent Volume
 
-Firstly, lets investigate persistance without a Persistent Volume attached to our conatiner. We'll start by accessing the terminal for our running container. We firstly need to ensure that we have switched from "Developer View", to "Administrator View" (Top left drop down menu). Next, choose the menu option "Pods" from the "Workloads" drop down on the left hand side of the screen. You should see two pods, one in a "Running" status and the other in a "Completed" status. Click the name of the pod which has the status "Running".
+Firstly, lets investigate persistence without a Persistent Volume attached to our container. We'll start by accessing the terminal for our running container. We firstly need to ensure that we have switched from "Developer View", to "Administrator View" (Top left drop down menu). Next, choose the menu option "Pods" from the "Workloads" drop down on the left hand side of the screen. You should see two pods, one in a "Running" status and the other in a "Completed" status. Click the name of the pod which has the status "Running".
 
 We now want to access the terminal, so choose that tab.
 
@@ -196,7 +196,7 @@ You should have the message "Testing Persistence" displayed in the terminal wind
 [TIP]
 .A note on stdin and stdout
 ====
-We have just used two linux commands, echo and cat which make use of a input and output streams within Linux known as stdin and stdout. You can read more here:
+We have just used two linux commands, echo and cat which make use of input and output streams within Linux known as stdin and stdout. You can read more here:
 http://www.howtogeek.com/435903/what-are-stdin-stdout-and-stderr-on-linux/[stdin, stdout,stderr]
 ====
 
@@ -205,11 +205,11 @@ image::08-07-verify-test.png[container root filesystem,700,align="center"]
 
 This should not be a suprise at this point, as the container is currently running within the pod. Remember, this filesystem is volatile - it is in memory and not actually persisted to any storage device. We can demonstrate this by "restarting the container". - We don't actually restart containers, we destroy and rebuild them. To do this, we will "scale down" our "deployment". 
 
-Whilst in the "Administrator" view, choose the drop down menu "Workloads" and then selected "Depployments". You should see the deployment that represents our running application listed as "bootcamp-webserver-git". Select the name (which is a link) and you should see beneath "Deployment details" a pair of "up and down" controls. This simply controls how many pods are deployed within the deployment. Scale this down to zero, which will destroy our current running container.
+Whilst in the "Administrator" view, choose the drop down menu "Workloads" and then selected "Deployments". You should see the deployment that represents our running application listed as "bootcamp-webserver-git". Select the name (which is a link) and you should see beneath "Deployment details" a pair of "up and down" controls. This simply controls how many pods are deployed within the deployment. Scale this down to zero, which will destroy our current running container.
 
 image::08-08-scale-down-pod.png[container root filesystem,300,align="center"]
 
-And next, scale the deployment back up to one, which will re-create our container.
+And next, scale the deployment back up to one, which will recreate our container.
 
 image::08-09-scale-up-pod.png[container root filesystem,300,align="center"]
 
@@ -227,13 +227,13 @@ You should see:
 
 image::08-10-test-persistence.png[container root filesystem,700,align="center"]
 
-Which confirms what we have discussed so far. By default, containers are ephemeral and do not have persistent storage. To make useful applications they need to either contect to and external data source (such as a database) or, have a volume mounted to them for persistence.
+Which confirms what we have discussed so far. By default, containers are ephemeral and do not have persistent storage. To make useful applications they need to either connect to an external data source (such as a database) or, have a volume mounted to them for persistence.
 
-=== Step 2 - With a Persistent Voume
+=== Step 2 - With a Persistent Volume
 
-Now we will solve the problem of data persistance by using OpenShift to provide a persistent volume to our container. 
+Now we will solve the problem of data persistence by using OpenShift to provide a persistent volume to our container. 
 
-Choose the "Workloads" drop down once more and then select "Deployments". Towards the far right of the window you should be able to see an options menu in the formof a kebab menu.:
+Choose the "Workloads" drop down once more and then select "Deployments". Towards the far right of the window you should be able to see an options menu in the form of a kebab menu.:
 
 image::08-11b-deployment-storage.png[container root filesystem,700,align="center"]
 
@@ -241,7 +241,7 @@ Choose "Add Storage".
 
 Next, we need to configure what type of storage we want to use. We could, use an existing storage claim if we had one but we want to create a new claim. Choose "Create new Claim".
 
-Once we select "Create new claim", we will see a number of options expand. The first option defines our StorageClass. In the screen shot this is of type "gp2" which represents a type of cloud storage in Amazon Web Services (AWS) that is specifc to AWS. StorageClasses allow us to obstract a layer of complexity away for us by not having to worry about the differences between the different combinations of storage and storage vendor. - This could be Auzre, Google Cloud, NetAPP storgae etc - as long as the storage adheres to a set of standards specifically designed for Kubernetes, OpenShift will be able to use it.
+Once we select "Create new claim", we will see a number of options expand. The first option defines our StorageClass. In the screen shot this is of type "gp2" which represents a type of cloud storage in Amazon Web Services (AWS) that is specific to AWS. StorageClasses allow us to abstract a layer of complexity away for us by not having to worry about the differences between the different combinations of storage and storage vendor. - This could be Auzre, Google Cloud, NetAPP storage etc - as long as the storage adheres to a set of standards specifically designed for Kubernetes, OpenShift will be able to use it.
 
 We need to name our PersistentVolumeClaim, enter:
 
@@ -253,7 +253,7 @@ bootcamp-webserver-pvc
 
 Choose a size of 1 GiB.
 
-Next, we will specifiy the mount path. As mentioned earlier, we map a volume to a path inside our container's filesystem. It is the /data directory that we want to make persistent, so enter:
+Next, we will specify the mount path. As mentioned earlier, we map a volume to a path inside our container's filesystem. It is the /data directory that we want to make persistent, so enter:
 
 [.console-input]
 [source]
@@ -267,11 +267,11 @@ We should have the following at this stage:
 
 image::08-11c-add-storage-details.png[storage details,800,align="center"]
 
-Click save. Once the persistant volume claim has been submitted, the OpenShift user interface will switch back to the deployment depicting that a scaling event has started:
+Click save. Once the persistent volume claim has been submitted, the OpenShift user interface will switch back to the deployment depicting that a scaling event has started:
 
 image::08-12-pvc-post-scale.png[container root filesystem,700,align="center"]
 
-Once the pod has scaled, we can once again try our test from earlier. Switch to the terminal for the conatiner, and create a text file within the /data folder which we have defined as a persistently mounted volume. As before ammend the deployment to scale the pod down to zero, and then back to one. Investigate and see that the file this time, has persisted.
+Once the pod has scaled, we can once again try our test from earlier. Switch to the terminal for the container, and create a text file within the /data folder which we have defined as a persistently mounted volume. As before amend the deployment to scale the pod down to zero, and then back to one. Investigate and see that the file this time, has persisted.
 
 
 image::08-13-testing-pvc.png[container root filesystem,700,align="center"]
