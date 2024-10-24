@@ -1,11 +1,11 @@
-= Welcome to the OpenShift Student Bootcamp
+= Welcome to the OpenShift  Bootcamp
 :!sectids:
 
 image::04-topology-image.png[Example Topology Image]
 
 == Using OpenShift to create and manage container based applications
 
-Welcome to the OpenShift Student Bootcamp. Over the next 2 days we will provide presentations, hands-on workshops and Q&A sessions to provide a structured introduction to container based applications running on the OpenShift platform from Red Hat.
+Welcome to the OpenShift  Bootcamp. Over the next 2 days we will provide presentations, hands-on workshops and Q&A sessions to provide a structured introduction to container based applications running on the OpenShift platform from Red Hat.
 
 Two pieces of information are required to configure the workshop instructions so that the corect OpenShift platform and username are included in the generated commands. This ensures that when you copy commands from the guides, during the workshop exercises, they will work correctly within your specific environment.
 

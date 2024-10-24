@@ -48,7 +48,7 @@ creation of an Application from an existing Image as shown in Module 02.
 
 [TIP]
 ====
-The example provided is a JAVA Quarkus application built for a student bootcamp. OpenShift provides a number of S2I Builder Images out-of-the-box; if you want to try another framework 
+The example provided is a JAVA Quarkus application built for a  bootcamp. OpenShift provides a number of S2I Builder Images out-of-the-box; if you want to try another framework 
 select a different Builder Image when prompted to use the OpenJDK one and use the 'Try Sample' link shown beneath the Git Repo URL textbox rather than the one provided in the instructions.
 ====
 

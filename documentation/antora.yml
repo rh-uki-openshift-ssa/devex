@@ -1,5 +1,5 @@
-name: openshift-student-bootcamp-2-day
-title: OpenShift Student Bootcamp
+name: openshift--bootcamp-2-day
+title: OpenShift  Bootcamp
 version: 4.11
 nav:
   - modules/ROOT/nav.adoc
